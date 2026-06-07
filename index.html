@@ -1,0 +1,1333 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cala Imperial · Mega-Resort Integrado · Aeródromo · Marina · Subaúma · Bahia</title>
+  <meta name="description" content="Cala Imperial — 1.280ha, 5,3km de praia, aeródromo executivo, marina 200 vagas, resort 5★. VGV R$7,5Bi · TIR 18–22% a.a. · ROI 167% · Subaúma · Linha Verde · Bahia.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script>
+  <style>
+    :root{
+      --gold:#C9A84C;--gold-l:#E8C97A;--gold-d:#8B6914;
+      --navy:#0B1E3F;--navy2:#122540;--navy3:#1A2E4A;
+      --teal:#0D3D4F;--teal2:#124558;
+      --dark:#0A0C0E;--dark2:#141618;--dark3:#1E2022;
+      --tl:#E8E0D0;--tm:#9B8E7A;
+    }
+    *{margin:0;padding:0;box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{font-family:'Montserrat',sans-serif;background:var(--dark);color:var(--tl);overflow-x:hidden}
+
+    /* LANG */
+    .lang-switcher{display:flex;align-items:center;gap:6px;margin-left:20px}
+    .lang-btn{background:transparent;border:2px solid transparent;border-radius:4px;cursor:pointer;padding:3px 8px;font-size:11px;font-weight:700;letter-spacing:1px;color:var(--tm);transition:all .3s;display:flex;align-items:center;gap:5px;font-family:'Montserrat',sans-serif}
+    .lang-btn:hover,.lang-btn.active{border-color:var(--gold);color:var(--gold);background:rgba(201,168,76,.12)}
+    .lang-btn .flag{font-size:16px;line-height:1}
+
+    /* NAV */
+    nav{position:fixed;top:0;left:0;right:0;z-index:1000;display:flex;justify-content:space-between;align-items:center;padding:22px 60px;transition:all .4s}
+    nav.sc{background:rgba(10,12,14,.97);backdrop-filter:blur(24px);padding:14px 60px;border-bottom:1px solid rgba(201,168,76,.18)}
+    .logo{display:flex;align-items:center;gap:14px;text-decoration:none}
+    .logo svg{width:46px;height:46px}
+    .logo-text span:first-child{font-family:'Cormorant Garamond',serif;font-size:16px;letter-spacing:4px;color:var(--gold);text-transform:uppercase;display:block;line-height:1.1}
+    .logo-text span:last-child{font-size:9px;letter-spacing:2px;color:var(--tm);text-transform:uppercase;display:block}
+    .nl{display:flex;gap:26px;list-style:none}
+    .nl a{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--tm);text-decoration:none;transition:color .3s}
+    .nl a:hover{color:var(--gold)}
+    .ncta{background:transparent;border:1px solid var(--gold);color:var(--gold);padding:10px 24px;font-size:10px;letter-spacing:2px;text-transform:uppercase;text-decoration:none;display:inline-block;transition:all .3s}
+    .ncta:hover{background:var(--gold);color:var(--dark)}
+
+    /* HERO VIDEO */
+    #hero{position:relative;height:100vh;min-height:720px;display:flex;align-items:center;justify-content:center;overflow:hidden}
+    .hvid{position:absolute;inset:0;z-index:0}
+    .hvid video{width:100%;height:100%;object-fit:cover;opacity:.48}
+    .hfallback{position:absolute;inset:0;background-image:url('97.png');background-size:cover;background-position:center;opacity:.48;animation:hz 26s ease-in-out infinite alternate}
+    @keyframes hz{from{transform:scale(1.02)}to{transform:scale(1.09)}}
+    .hov{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(10,12,14,.3) 0%,rgba(10,12,14,.06) 30%,rgba(10,12,14,.65) 75%,rgba(10,12,14,1) 100%)}
+    .hc{position:relative;z-index:2;text-align:center;max-width:1000px;padding:0 40px}
+    .hbadge{display:inline-flex;align-items:center;gap:10px;border:1px solid rgba(201,168,76,.4);padding:8px 22px;margin-bottom:28px;font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--gold-l);animation:fid 1s ease forwards}
+    .hbadge::before,.hbadge::after{content:'◆';font-size:6px;color:var(--gold)}
+    .hpre{font-family:'Cormorant Garamond',serif;font-size:14px;letter-spacing:6px;text-transform:uppercase;color:var(--gold);margin-bottom:14px;opacity:0;animation:fiu 1s .3s ease forwards}
+    .ht{font-family:'Cormorant Garamond',serif;font-size:clamp(56px,9vw,112px);font-weight:300;line-height:.9;color:#fff;opacity:0;animation:fiu 1s .5s ease forwards;margin-bottom:10px}
+    .ht em{font-style:italic;color:var(--gold-l)}
+    .hsub{font-size:11px;letter-spacing:4px;text-transform:uppercase;color:var(--tm);margin-bottom:48px;opacity:0;animation:fiu 1s .7s ease forwards}
+    .hstats{display:flex;justify-content:center;gap:56px;margin-bottom:48px;opacity:0;animation:fiu 1s .9s ease forwards;flex-wrap:wrap}
+    .hstat-v{font-family:'Cormorant Garamond',serif;font-size:40px;font-weight:300;color:var(--gold-l);display:block}
+    .hstat-l{font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--tm);display:block;margin-top:4px}
+    .hact{display:flex;gap:18px;justify-content:center;opacity:0;animation:fiu 1s 1.1s ease forwards}
+    .btn1{background:var(--gold);color:var(--dark);border:none;padding:17px 40px;font-size:10px;letter-spacing:2.5px;text-transform:uppercase;font-weight:700;cursor:pointer;text-decoration:none;display:inline-block;transition:all .3s}
+    .btn1:hover{background:var(--gold-l)}
+    .btn2{background:transparent;color:var(--tl);border:1px solid rgba(255,255,255,.3);padding:17px 40px;font-size:10px;letter-spacing:2.5px;text-transform:uppercase;cursor:pointer;text-decoration:none;display:inline-block;transition:all .3s}
+    .btn2:hover{border-color:var(--gold);color:var(--gold)}
+    .hscroll{position:absolute;bottom:34px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:8px;opacity:0;animation:fiu 1s 1.4s ease forwards}
+    .hscroll span{font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--tm)}
+    .sl{width:1px;height:48px;background:linear-gradient(to bottom,var(--gold),transparent);animation:sa 2s infinite}
+    @keyframes sa{0%{transform:scaleY(0);transform-origin:top}50%{transform:scaleY(1);transform-origin:top}51%{transform:scaleY(1);transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
+    @keyframes fid{from{opacity:0;transform:translateY(-18px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes fiu{from{opacity:0;transform:translateY(26px)}to{opacity:1;transform:translateY(0)}}
+
+    /* SECTIONS */
+    section{padding:110px 0}
+    .ct{max-width:1320px;margin:0 auto;padding:0 60px}
+    .stag{font-size:8px;letter-spacing:4px;text-transform:uppercase;color:var(--gold);margin-bottom:14px;display:block}
+    .st{font-family:'Cormorant Garamond',serif;font-size:clamp(36px,4.5vw,62px);font-weight:300;line-height:1.05;color:#fff;margin-bottom:20px}
+    .st em{color:var(--gold-l);font-style:italic}
+    .sd{font-size:14px;line-height:1.85;color:var(--tm);max-width:580px}
+    .gd{width:60px;height:1px;background:var(--gold);margin:26px 0}
+
+    /* NUMS BAR */
+    #nb{background:var(--dark2);border-top:1px solid rgba(201,168,76,.15);border-bottom:1px solid rgba(201,168,76,.15);padding:52px 0}
+    .ng{display:grid;grid-template-columns:repeat(5,1fr)}
+    .ni{text-align:center;padding:18px;border-right:1px solid rgba(201,168,76,.1)}
+    .ni:last-child{border-right:none}
+    .nv{font-family:'Cormorant Garamond',serif;font-size:46px;font-weight:300;color:var(--gold-l);display:block;line-height:1}
+    .ns{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--tm);margin-top:8px;display:block}
+
+    /* GALLERY STRIP */
+    .gstrip{display:grid;grid-template-columns:2fr 1fr 1fr;grid-template-rows:340px 340px;gap:3px}
+    .gi{overflow:hidden;cursor:pointer;position:relative}
+    .gi:first-child{grid-row:1/3}
+    .gi img,.gi video{width:100%;height:100%;object-fit:cover;transition:transform .7s}
+    .gi:hover img,.gi:hover video{transform:scale(1.05)}
+    .gcap{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(to top,rgba(0,0,0,.82),transparent);padding:28px 18px 12px;font-size:10px;letter-spacing:2px;color:rgba(255,255,255,.75);text-transform:uppercase;transform:translateY(100%);transition:transform .3s}
+    .gi:hover .gcap{transform:translateY(0)}
+
+    /* CONCEITO */
+    #conceito{background:var(--teal)}
+    .cg{display:grid;grid-template-columns:1fr 1fr;gap:90px;align-items:center}
+    .ci{position:relative}
+    .ci img,.ci video{width:100%;display:block}
+    .ci::before{content:'';position:absolute;top:-14px;left:-14px;right:14px;bottom:14px;border:1px solid rgba(201,168,76,.25);pointer-events:none}
+    .krow{display:flex;gap:12px;margin-top:32px;flex-wrap:wrap}
+    .kbox{text-align:center;padding:16px 20px;background:rgba(201,168,76,.07);border:1px solid rgba(201,168,76,.18);flex:1;min-width:86px}
+    .kv{font-family:'Cormorant Garamond',serif;font-size:24px;color:var(--gold-l);display:block;line-height:1}
+    .kl{font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--tm);margin-top:5px;display:block}
+
+    /* ZONAS */
+    #zonas{background:var(--dark)}
+    .zg{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;background:rgba(201,168,76,.08);margin-top:60px}
+    .zc{background:var(--dark2);padding:38px 30px;position:relative;overflow:hidden;transition:background .4s}
+    .zc:hover{background:var(--dark3)}
+    .zc::before{content:'';position:absolute;top:0;left:0;width:3px;height:100%;background:var(--gold);transform:scaleY(0);transform-origin:bottom;transition:transform .4s}
+    .zc:hover::before{transform:scaleY(1)}
+    .zi{font-size:32px;margin-bottom:14px}
+    .zt{font-family:'Cormorant Garamond',serif;font-size:26px;color:#fff;margin-bottom:10px;line-height:1.15}
+    .zha{font-size:11px;letter-spacing:2px;color:var(--gold);text-transform:uppercase;margin-bottom:10px;display:block}
+    .zd{font-size:12px;line-height:1.85;color:var(--tm)}
+    .zl{list-style:none;margin-top:14px}
+    .zl li{font-size:11px;color:var(--tm);padding:4px 0 4px 12px;border-bottom:1px solid rgba(255,255,255,.04);position:relative}
+    .zl li::before{content:'▸';color:var(--gold);position:absolute;left:0;font-size:9px;top:5px}
+
+    /* MASTERPLAN */
+    #masterplan{background:var(--teal)}
+    .mpt{display:flex;transition:transform .6s cubic-bezier(.25,.8,.25,1)}
+    .mps{min-width:100%;cursor:zoom-in}
+    .mps img{width:100%;max-height:700px;object-fit:contain;background:#060d12;display:block}
+    .mpi{background:var(--dark2);padding:26px 40px;display:flex;justify-content:space-between;align-items:center;border-top:1px solid rgba(201,168,76,.15)}
+    .mpb{background:transparent;border:1px solid rgba(255,255,255,.15);color:var(--tm);width:48px;height:48px;cursor:pointer;font-size:18px;transition:all .3s;display:flex;align-items:center;justify-content:center}
+    .mpb:hover{border-color:var(--gold);color:var(--gold)}
+    .mpd{width:8px;height:8px;border-radius:50%;border:none;cursor:pointer;background:rgba(255,255,255,.2);transition:background .3s;padding:0}
+
+    /* GALERIA VÍDEOS */
+    #videos{background:var(--dark2);padding:96px 0}
+    .vg{display:grid;grid-template-columns:repeat(3,1fr);gap:3px;margin-top:48px}
+    .vc{overflow:hidden;position:relative;height:300px}
+    .vc video{width:100%;height:100%;object-fit:cover;transition:transform .7s}
+    .vc:hover video{transform:scale(1.04)}
+    .vcap{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(to top,rgba(0,0,0,.85),transparent);padding:22px 16px 10px;font-size:10px;letter-spacing:2px;color:rgba(255,255,255,.8);text-transform:uppercase}
+
+    /* PRODUTOS */
+    #produtos{background:var(--dark2)}
+    .pg{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:rgba(201,168,76,.1);margin-top:68px}
+    .pc{background:var(--dark2);padding:38px 24px;position:relative;overflow:hidden;transition:background .4s}
+    .pc:hover{background:var(--dark3)}
+    .pc::before{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:var(--gold);transform:scaleX(0);transform-origin:left;transition:transform .4s}
+    .pc:hover::before{transform:scaleX(1)}
+    .pn{font-family:'Cormorant Garamond',serif;font-size:52px;font-weight:300;color:rgba(201,168,76,.07);line-height:1;margin-bottom:12px}
+    .pi{font-size:26px;margin-bottom:10px}
+    .pt{font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:8px}
+    .pm{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:300;color:#fff;margin-bottom:10px;line-height:1.2}
+    .pd{font-size:11px;line-height:1.85;color:var(--tm);margin-bottom:18px}
+    .psp{list-style:none}
+    .psp li{font-size:11px;color:var(--tm);padding:5px 0;border-bottom:1px solid rgba(255,255,255,.04);display:flex;justify-content:space-between}
+    .psp li span{color:var(--gold-l);font-weight:500}
+
+    /* LOCALIZAÇÃO */
+    #loc{background:var(--dark)}
+    .lg2{display:grid;grid-template-columns:1fr 1fr;gap:52px;align-items:start;margin-top:52px}
+    #mapa{height:460px;border:1px solid rgba(201,168,76,.2)}
+    .li{display:flex;align-items:flex-start;gap:16px;padding:16px 20px;background:rgba(255,255,255,.02);border-left:2px solid rgba(201,168,76,.3);margin-bottom:12px}
+    .lit{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:3px}
+    .liv{font-size:13px;color:var(--tl);font-family:'Cormorant Garamond',serif;line-height:1.4}
+
+    /* INVESTIMENTO */
+    #inv{background:var(--navy)}
+    .itabs{display:flex;border-bottom:1px solid rgba(201,168,76,.15);margin-top:52px;margin-bottom:40px;flex-wrap:wrap}
+    .itab{padding:13px 22px;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--tm);cursor:pointer;border-bottom:2px solid transparent;transition:all .3s}
+    .itab.active{color:var(--gold);border-bottom-color:var(--gold)}
+    .ipanel{display:none}.ipanel.active{display:block}
+    .ihl3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-bottom:40px}
+    .ihl{background:rgba(201,168,76,.04);border:1px solid rgba(201,168,76,.12);padding:28px;text-align:center}
+    .ihlv{font-family:'Cormorant Garamond',serif;font-size:40px;font-weight:300;color:var(--gold-l);display:block;line-height:1}
+    .ihll{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--tm);margin-top:9px;display:block}
+    table{width:100%;border-collapse:collapse;font-size:13px}
+    th{background:rgba(201,168,76,.08);color:var(--gold);font-size:9px;letter-spacing:2px;text-transform:uppercase;padding:13px 16px;text-align:left;border-bottom:1px solid rgba(201,168,76,.2);font-weight:500}
+    td{padding:13px 16px;color:var(--tm);border-bottom:1px solid rgba(255,255,255,.04)}
+    tr.tr{background:rgba(201,168,76,.05)}
+    tr.tr td{color:var(--gold-l);font-weight:600}
+    tr.tz td{color:rgba(255,255,255,.26)}
+    .sc3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:40px}
+    .sc{padding:28px;border:1px solid rgba(201,168,76,.15)}
+    .cf6{display:grid;grid-template-columns:repeat(6,1fr);gap:2px;background:rgba(201,168,76,.1);margin-top:18px}
+    .cf6d{background:var(--dark3);padding:18px;text-align:center}
+
+    /* CRONOGRAMA */
+    #cron{background:var(--dark)}
+    .tl{margin-top:68px;position:relative}
+    .tl::before{content:'';position:absolute;left:28px;top:0;bottom:0;width:1px;background:linear-gradient(to bottom,var(--gold),transparent)}
+    .tli{display:flex;gap:32px;margin-bottom:40px}
+    .tld{width:56px;height:56px;border:1px solid rgba(201,168,76,.4);background:var(--dark);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--gold);position:relative;z-index:1}
+    .tlc{padding-top:8px;flex:1}
+    .tlp{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:5px}
+    .tlt{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:300;color:#fff;margin-bottom:9px}
+    .tldesc{font-size:13px;line-height:1.8;color:var(--tm);max-width:640px}
+    .tlv{display:inline-block;margin-top:9px;font-size:11px;color:var(--gold-l);border:1px solid rgba(201,168,76,.25);padding:5px 12px}
+
+    /* SPE */
+    #spe{background:var(--dark2)}
+    .speg{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;background:rgba(201,168,76,.1);margin-top:52px}
+    .spec{background:var(--dark2);padding:42px 30px}
+    .spet{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:12px}
+    .spen{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:300;color:#fff;margin-bottom:16px}
+    .spel{list-style:none}
+    .spel li{font-size:12px;color:var(--tm);padding:7px 0;border-bottom:1px solid rgba(255,255,255,.04);padding-left:12px;position:relative}
+    .spel li::before{content:'▸';color:var(--gold);position:absolute;left:0;font-size:10px}
+    .spep{margin-top:40px;border:1px solid rgba(201,168,76,.1);padding:32px}
+    .spepp{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:20px}
+    .spepg{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+    .spepi{font-size:12px;color:var(--tm);padding:10px 14px;background:rgba(201,168,76,.03);border-left:2px solid rgba(201,168,76,.3)}
+
+    /* PASSOS */
+    #passos{background:var(--teal)}
+    .pasg{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;background:rgba(255,255,255,.04);margin-top:52px}
+    .pasc{background:var(--teal);padding:42px 30px;position:relative;transition:background .3s}
+    .pasc:hover{background:var(--teal2)}
+    .pasn{font-family:'Cormorant Garamond',serif;font-size:64px;font-weight:300;color:rgba(201,168,76,.07);position:absolute;top:16px;right:22px;line-height:1}
+    .pasi{font-size:26px;margin-bottom:16px}
+    .past{font-family:'Cormorant Garamond',serif;font-size:22px;color:#fff;margin-bottom:9px}
+    .pasd{font-size:12px;line-height:1.85;color:var(--tm)}
+    .pastime{margin-top:12px;font-size:10px;letter-spacing:2px;color:var(--gold)}
+
+    /* GALERIA */
+    #galeria{background:var(--dark2);padding:96px 0}
+    .gg{display:grid;grid-template-columns:repeat(4,1fr);gap:3px;margin-top:48px}
+    .gg .gi{height:260px}
+
+    /* CONTATO */
+    #contato{background:var(--dark)}
+    .cog{display:grid;grid-template-columns:1fr 1fr;gap:76px;align-items:start}
+    .cof{display:flex;flex-direction:column;gap:13px}
+    .cfr{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+    .cfg{display:flex;flex-direction:column;gap:6px}
+    .cfg label{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--tm)}
+    .cfg input,.cfg select,.cfg textarea{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:var(--tl);padding:13px 15px;font-size:13px;font-family:'Montserrat',sans-serif;outline:none;transition:border-color .3s;-webkit-appearance:none;width:100%}
+    .cfg input:focus,.cfg select:focus,.cfg textarea:focus{border-color:var(--gold)}
+    .cfg textarea{resize:vertical;min-height:108px}
+    .cfg select option{background:var(--dark2)}
+    .cfsub{background:var(--gold);color:var(--dark);border:none;padding:17px;font-size:10px;letter-spacing:3px;text-transform:uppercase;font-weight:700;cursor:pointer;font-family:'Montserrat',sans-serif;transition:background .3s;margin-top:5px;width:100%}
+    .cfsub:hover{background:var(--gold-l)}
+    .cii{display:flex;align-items:flex-start;gap:16px;margin-bottom:22px;padding-bottom:22px;border-bottom:1px solid rgba(255,255,255,.06)}
+    .cil{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:3px}
+    .civ{font-size:14px;color:var(--tl)}
+    .fsuc{display:none;text-align:center;padding:52px 36px;background:rgba(201,168,76,.06);border:1px solid rgba(201,168,76,.2)}
+    .fsuc h3{font-family:'Cormorant Garamond',serif;font-size:30px;color:var(--gold-l);margin-bottom:9px}
+
+    /* FOOTER */
+    footer{background:var(--dark);border-top:1px solid rgba(201,168,76,.1);padding:52px 0 26px}
+    .fg{display:grid;grid-template-columns:2fr 1fr 1fr;gap:52px;margin-bottom:40px}
+    .fbd{font-size:12px;line-height:1.85;color:var(--tm);margin-top:13px;max-width:340px}
+    .fct{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:16px}
+    .fcl{list-style:none}
+    .fcl li{margin-bottom:9px}
+    .fcl a{font-size:12px;color:var(--tm);text-decoration:none;transition:color .3s}
+    .fcl a:hover{color:var(--gold-l)}
+    .fb{border-top:1px solid rgba(255,255,255,.04);padding-top:20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
+    .fc{font-size:11px;color:var(--tm)}
+    .fl{font-size:10px;color:rgba(255,255,255,.2);text-align:right;max-width:480px}
+
+    /* LIGHTBOX */
+    .lb{display:none;position:fixed;inset:0;background:rgba(0,0,0,.96);z-index:9999;align-items:center;justify-content:center}
+    .lb.active{display:flex}
+    .lb img{max-width:95vw;max-height:95vh;object-fit:contain}
+    .lbc{position:absolute;top:20px;right:20px;color:#fff;font-size:32px;cursor:pointer;background:none;border:none;line-height:1;padding:8px}
+
+    /* RESPONSIVE */
+    @media(max-width:1200px){.pg{grid-template-columns:repeat(3,1fr)}}
+    @media(max-width:1024px){
+      nav{padding:16px 30px}nav.sc{padding:12px 30px}
+      .ct{padding:0 30px}
+      .cg,.lg2,.cog,.fg{grid-template-columns:1fr;gap:40px}
+      .ng{grid-template-columns:repeat(3,1fr)}
+      .pg,.zg{grid-template-columns:1fr 1fr}
+      .speg,.pasg{grid-template-columns:1fr}
+      .sc3{grid-template-columns:1fr}
+      .gstrip{grid-template-columns:1fr 1fr;grid-template-rows:auto}
+      .gi:first-child{grid-row:auto}.gi{height:230px}
+      .vg{grid-template-columns:1fr 1fr}
+    }
+    @media(max-width:768px){
+      .nl,.ncta{display:none}
+      .hstats{gap:20px}
+      .pg,.ng,.zg{grid-template-columns:1fr}
+      .ihl3{grid-template-columns:1fr}
+      .spepg,.cfr{grid-template-columns:1fr}
+      section{padding:80px 0}
+      .gg{grid-template-columns:1fr 1fr}
+      .gstrip{grid-template-columns:1fr}
+      .vg{grid-template-columns:1fr}
+      .cf6{grid-template-columns:repeat(3,1fr)}
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav id="nav">
+  <a href="#" class="logo">
+    <svg viewBox="0 0 46 46" fill="none">
+      <polygon points="23,3 43,23 23,43 3,23" stroke="#C9A84C" stroke-width="1.2" fill="none"/>
+      <polygon points="23,8 38,23 23,38 8,23" stroke="#C9A84C" stroke-width="0.5" fill="none" opacity="0.5"/>
+      <circle cx="23" cy="23" r="6" stroke="#C9A84C" stroke-width="0.5" fill="none" opacity="0.3"/>
+      <text x="23" y="27.5" text-anchor="middle" font-family="serif" font-size="9" fill="#C9A84C" font-style="italic">CI</text>
+    </svg>
+    <div class="logo-text"><span>Cala Imperial</span><span>Subaúma · Linha Verde · Bahia</span></div>
+  </a>
+  <ul class="nl">
+    <li><a href="#conceito" data-i18n="nav_project">O Projeto</a></li>
+    <li><a href="#zonas" data-i18n="nav_zones">Plano Diretor</a></li>
+    <li><a href="#produtos" data-i18n="nav_products">Produtos</a></li>
+    <li><a href="#masterplan" data-i18n="nav_masterplan">Masterplan</a></li>
+    <li><a href="#inv" data-i18n="nav_invest">Investimento</a></li>
+    <li><a href="#galeria" data-i18n="nav_gallery">Galeria</a></li>
+  </ul>
+  <div class="lang-switcher">
+    <button class="lang-btn active" onclick="setLang('pt')" id="btn-pt"><span class="flag">🇧🇷</span> PT</button>
+    <button class="lang-btn" onclick="setLang('en')" id="btn-en"><span class="flag">🇬🇧</span> EN</button>
+  </div>
+  <a href="#contato" class="ncta" data-i18n="nav_cta">Solicitar NDA</a>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hvid">
+    <video autoplay muted loop playsinline id="heroVid">
+      <source src="Empreendimento_Subauma_1.mp4" type="video/mp4">
+    </video>
+    <div class="hfallback" id="hfb" style="display:none"></div>
+  </div>
+  <div class="hov"></div>
+  <div class="hc">
+    <div class="hbadge" data-i18n="hero_badge">Subaúma · Entre Rios · Linha Verde · Bahia · Brasil</div>
+    <p class="hpre" data-i18n="hero_pre">Aeródromo Executivo · Marina · Resort 5★ · Residências Ultra-Luxury</p>
+    <h1 class="ht">Cala <em>Imperial</em></h1>
+    <p class="hsub" data-i18n="hero_sub">O Maior Mega-Resort Integrado do Nordeste Brasileiro · 1.280 Hectares · 5,3km de Praia</p>
+    <div class="hstats">
+      <div><span class="hstat-v">1.280ha</span><span class="hstat-l" data-i18n="hs_area">Área Total</span></div>
+      <div><span class="hstat-v">5,3km</span><span class="hstat-l" data-i18n="hs_beach">Frente de Praia</span></div>
+      <div><span class="hstat-v">R$7,5Bi</span><span class="hstat-l" data-i18n="hs_vgv">VGV Projetado</span></div>
+      <div><span class="hstat-v">167%</span><span class="hstat-l" data-i18n="hs_roi">ROI em 8 anos</span></div>
+    </div>
+    <div class="hact">
+      <a href="#conceito" class="btn1" data-i18n="hero_btn1">Explorar o Projeto</a>
+      <a href="#contato" class="btn2" data-i18n="hero_btn2">Solicitar NDA</a>
+    </div>
+  </div>
+  <div class="hscroll"><span>Scroll</span><div class="sl"></div></div>
+</section>
+
+<!-- NUMS BAR -->
+<div id="nb"><div class="ct"><div class="ng">
+  <div class="ni"><span class="nv">R$700M</span><span class="ns" data-i18n="nb_entry">Entrada 25% · Inicia o Empreendimento</span></div>
+  <div class="ni"><span class="nv">R$165M</span><span class="ns" data-i18n="nb_land">Terrenista · Incluso na Entrada</span></div>
+  <div class="ni"><span class="nv">R$7,5Bi</span><span class="ns" data-i18n="nb_vgv">VGV Projetado</span></div>
+  <div class="ni"><span class="nv">167%</span><span class="ns" data-i18n="nb_roi">ROI em 8 Anos</span></div>
+  <div class="ni"><span class="nv">20%</span><span class="ns" data-i18n="nb_tir">TIR a.a.</span></div>
+</div></div></div>
+
+<!-- GALLERY STRIP -->
+<div style="background:var(--dark);padding:0">
+  <div class="gstrip">
+    <div class="gi" onclick="openLb('97.png')">
+      <img src="97.png" alt="Vista aérea Cala Imperial">
+      <div class="gcap">Vista Aérea · 1.280 Hectares · 5,3km de Praia</div>
+    </div>
+    <div class="gi" onclick="openLb('95.png')">
+      <img src="95.png" alt="Marina Imperial sunrise">
+      <div class="gcap">Marina Imperial · Sunrise</div>
+    </div>
+    <div class="gi" onclick="openLb('99.png')">
+      <img src="99.png" alt="Marina Central e Clube Náutico">
+      <div class="gcap">Marina Central · Clube Náutico</div>
+    </div>
+    <div class="gi" onclick="openLb('98.png')">
+      <img src="98.png" alt="Promenade marina yachts">
+      <div class="gcap">Promenade · Superyachts · Pôr do Sol</div>
+    </div>
+    <div class="gi" onclick="openLb('100.png')">
+      <img src="100.png" alt="Resort Beira-Mar Praia Privativa">
+      <div class="gcap">Resort Beira-Mar · Praia Privativa</div>
+    </div>
+  </div>
+</div>
+
+<!-- CONCEITO -->
+<section id="conceito">
+  <div class="ct">
+    <div class="cg">
+      <div>
+        <span class="stag" data-i18n="tag_concept">◆ O Conceito</span>
+        <h2 class="st">Inspirado em Dubai,<br>Mônaco e <em>Mallorca.</em></h2>
+        <div class="gd"></div>
+        <p class="sd" data-i18n="concept_desc1">Cala Imperial é o primeiro mega-resort integrado do Nordeste brasileiro — e o maior da América Latina. Em 1.280 hectares com 5,3 quilômetros de praia virgem na Linha Verde de Bahia, nasce um ecossistema completo de ultra-luxury: aeródromo executivo com pista de 1.800m, marina circular para 200+ superyachts, resort de 600 unidades hoteleiras, 850 lotes e residências e 360 hectares de Reserva Natural de Mata Atlântica.</p>
+        <p class="sd" style="margin-top:16px" data-i18n="concept_desc2">Localizado entre Costa do Sauípe e Praia do Forte — as regiões mais valorizadas do Nordeste — o projeto oferece ao investidor a oportunidade de criar um destino global de luxo em terra ainda virgem, com custo de aquisição 50 a 200 vezes mais competitivo que os concorrentes.</p>
+        <div class="krow">
+          <div class="kbox"><span class="kv">1.280ha</span><span class="kl" data-i18n="kl_area">Área Total</span></div>
+          <div class="kbox"><span class="kv">5,3km</span><span class="kl" data-i18n="kl_beach">Praia Virgem</span></div>
+          <div class="kbox"><span class="kv">85km</span><span class="kl" data-i18n="kl_salvador">De Salvador</span></div>
+          <div class="kbox"><span class="kv">R$160M</span><span class="kl" data-i18n="kl_land">Valor Terreno</span></div>
+        </div>
+      </div>
+      <div class="ci">
+        <img src="94.png" alt="Lobby Resort Beira-Mar Cala Imperial">
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PLANO DIRETOR / ZONAS -->
+<section id="zonas">
+  <div class="ct">
+    <span class="stag" data-i18n="tag_zones">◆ Plano Diretor · Fase 1</span>
+    <h2 class="st">6 Zonas.<br><em>Um Ecossistema Completo.</em></h2>
+    <p class="sd" data-i18n="zones_desc">O Mapa de Densidade Urbana define 6 zonas distintas que compõem o ecossistema integrado de Cala Imperial — combinando turismo de ultra-luxury, residências de alto padrão, aviação executiva e preservação ambiental.</p>
+    <div class="zg">
+      <div class="zc">
+        <div class="zi">✈️</div>
+        <div class="zha" data-i18n="z1_ha">120 hectares</div>
+        <div class="zt" data-i18n="z1_title">Aeroporto Executivo</div>
+        <div class="zd" data-i18n="z1_desc">Aeródromo privativo com pista 1.800m × 45m (Cat. 4C), capacidade para jatos executivos de grande porte, operação IFR noturna.</div>
+        <ul class="zl">
+          <li data-i18n="z1_l1">Pista 1.800m × 45m · Cat. 4C</li>
+          <li data-i18n="z1_l2">15 Hangares Executivos (400–1.000m²)</li>
+          <li data-i18n="z1_l3">Terminal FBO · 2.500m² · VIP Lounge</li>
+          <li data-i18n="z1_l4">Torre de Controle + Heliponto Cat. 1</li>
+          <li data-i18n="z1_l5">Operação IFR noturna · Jet fuel</li>
+        </ul>
+      </div>
+      <div class="zc">
+        <div class="zi">⚓</div>
+        <div class="zha" data-i18n="z2_ha">Marina + Resort</div>
+        <div class="zt" data-i18n="z2_title">Zona Hoteleira</div>
+        <div class="zd" data-i18n="z2_desc">Resort 5★ de 600 unidades hoteleiras com marina circular para 200+ superyachts, beach club, spa, golf e shopping boulevard.</div>
+        <ul class="zl">
+          <li data-i18n="z2_l1">Resort 5★ · 600 Unidades Hoteleiras</li>
+          <li data-i18n="z2_l2">Marina Circular · 200+ vagas superyachts</li>
+          <li data-i18n="z2_l3">Beach Club Premium · Infinity Pools</li>
+          <li data-i18n="z2_l4">Spa & Wellness · Golf 9 holes</li>
+          <li data-i18n="z2_l5">Shopping Boulevard · 8.000m² · 40 lojas</li>
+        </ul>
+      </div>
+      <div class="zc">
+        <div class="zi">🏡</div>
+        <div class="zha" data-i18n="z3_ha">450 hectares</div>
+        <div class="zt" data-i18n="z3_title">Zona Residencial</div>
+        <div class="zd" data-i18n="z3_desc">850 lotes e residências divididos em alta, média e baixa densidade, com clube privativo, canal navegável e segurança 24h.</div>
+        <ul class="zl">
+          <li data-i18n="z3_l1">180 Lotes Premium Frente-Mar (1.500–2.500m²)</li>
+          <li data-i18n="z3_l2">420 Lotes Standard (1.000–1.500m²)</li>
+          <li data-i18n="z3_l3">150 Chalés Condomínio · 350m² cada</li>
+          <li data-i18n="z3_l4">100 Aptos Beira-Mar · 180–350m²</li>
+          <li data-i18n="z3_l5">Bairro Circular com praça central</li>
+        </ul>
+      </div>
+      <div class="zc">
+        <div class="zi">🌿</div>
+        <div class="zha" data-i18n="z4_ha">360 hectares preservados</div>
+        <div class="zt" data-i18n="z4_title">RPPN Mata Atlântica</div>
+        <div class="zd" data-i18n="z4_desc">Reserva Natural Particular do Patrimônio Natural — 360 hectares de Mata Atlântica preservada, gerando créditos de carbono e certificação LEED Platinum.</div>
+        <ul class="zl">
+          <li data-i18n="z4_l1">360ha Reserva Natural (RPPN)</li>
+          <li data-i18n="z4_l2">Certificação LEED Platinum</li>
+          <li data-i18n="z4_l3">Créditos de Carbono · Eco-turismo</li>
+          <li data-i18n="z4_l4">Trilhas · Centro de Visitação</li>
+        </ul>
+      </div>
+      <div class="zc">
+        <div class="zi">🚤</div>
+        <div class="zha" data-i18n="z5_ha">Canal Navegável</div>
+        <div class="zt" data-i18n="z5_title">Canal Imperial</div>
+        <div class="zd" data-i18n="z5_desc">Canal navegável que integra a marina à zona residencial e às áreas de lazer — um percurso aquático privativo único no Brasil.</div>
+        <ul class="zl">
+          <li data-i18n="z5_l1">Canal navegável interligando zonas</li>
+          <li data-i18n="z5_l2">Cais privativos residenciais</li>
+          <li data-i18n="z5_l3">Passeios de barco internos</li>
+          <li data-i18n="z5_l4">Esportes náuticos exclusivos</li>
+        </ul>
+      </div>
+      <div class="zc">
+        <div class="zi">🏖️</div>
+        <div class="zha" data-i18n="z6_ha">Zona Turística</div>
+        <div class="zt" data-i18n="z6_title">Resort Beira-Mar</div>
+        <div class="zd" data-i18n="z6_desc">Zona Turística de Alta Intensidade com resort beira-mar, piscinas olímpicas, tiki bar e praia privativa de 5,3km — o maior frente de praia privativo do Nordeste.</div>
+        <ul class="zl">
+          <li data-i18n="z6_l1">5,3km de Praia Privativa</li>
+          <li data-i18n="z6_l2">Piscinas Resort · Tiki Bar</li>
+          <li data-i18n="z6_l3">Beach Club 5.000m²</li>
+          <li data-i18n="z6_l4">Deck madeira nobre · Cabanas VIP</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MASTERPLAN -->
+<section id="masterplan">
+  <div class="ct">
+    <span class="stag" data-i18n="tag_mp">◆ Masterplan</span>
+    <h2 class="st">Plano Diretor<br><em>Fase 1.</em></h2>
+    <p class="sd" data-i18n="mp_desc">1.280 hectares com zoneamento detalhado — Aeroporto Executivo, Marina Central, Resort Beira-Mar, Zona Residencial, Canal Navegável e 360ha de Reserva Natural de Mata Atlântica.</p>
+    <p style="text-align:right;font-size:10px;color:var(--tm);margin-top:8px" data-i18n="mp_caption">Clique para ampliar · Mapa de Densidade Urbana · Plano Diretor Fase 1</p>
+  </div>
+  <div style="overflow:hidden;margin-top:32px">
+    <div class="mpt" id="mpTrack">
+      <div class="mps"><img src="masterplan_6.png" alt="Plano Diretor Fase 1 Cala Imperial" onclick="openLb('masterplan_6.png')"></div>
+      <div class="mps"><img src="102.png" alt="Masterplan Beachfront" onclick="openLb('102.png')"></div>
+      <div class="mps"><img src="99.png" alt="Marina Central Masterplan" onclick="openLb('99.png')"></div>
+      <div class="mps"><img src="100.png" alt="Resort Beira-Mar" onclick="openLb('100.png')"></div>
+      <div class="mps"><img src="101.png" alt="Bairro Circular" onclick="openLb('101.png')"></div>
+      <div class="mps"><img src="96.png" alt="Vista Aérea com Aeródromo" onclick="openLb('96.png')"></div>
+      <div class="mps"><img src="97.png" alt="Masterplan Aerial Geral" onclick="openLb('97.png')"></div>
+    </div>
+    <div class="mpi">
+      <div style="display:flex;gap:10px">
+        <button class="mpb" onclick="mpNav(-1)">←</button>
+        <button class="mpb" onclick="mpNav(1)">→</button>
+      </div>
+      <div style="font-family:'Cormorant Garamond',serif;font-size:16px;color:var(--tm)" id="mpLabel">Plano Diretor Fase 1 · Mapa de Densidade Urbana</div>
+      <div style="display:flex;gap:8px" id="mpDots"></div>
+    </div>
+  </div>
+</section>
+
+<!-- VÍDEOS -->
+<section id="videos">
+  <div class="ct">
+    <span class="stag" data-i18n="tag_videos">◆ Vídeos do Empreendimento</span>
+    <h2 class="st">Cala Imperial<br><em>em Movimento.</em></h2>
+  </div>
+  <div class="ct" style="padding-top:0">
+    <div class="vg">
+      <div class="vc">
+        <video autoplay muted loop playsinline><source src="Empreendimento_Subauma_2.mp4" type="video/mp4"></video>
+        <div class="vcap" data-i18n="vid1_cap">Vista Aérea · Empreendimento</div>
+      </div>
+      <div class="vc">
+        <video autoplay muted loop playsinline><source src="Empreendimento_Subauma_5.mp4" type="video/mp4"></video>
+        <div class="vcap" data-i18n="vid2_cap">Marina Imperial · Aerial</div>
+      </div>
+      <div class="vc">
+        <video autoplay muted loop playsinline><source src="Marina_Barco.mp4" type="video/mp4"></video>
+        <div class="vcap" data-i18n="vid3_cap">Marina Central · Superyachts</div>
+      </div>
+      <div class="vc">
+        <video autoplay muted loop playsinline><source src="Empreendimento_Subauma_7.mp4" type="video/mp4"></video>
+        <div class="vcap" data-i18n="vid4_cap">Resort Beira-Mar · Praia</div>
+      </div>
+      <div class="vc">
+        <video autoplay muted loop playsinline><source src="Empreendimento_Subauma_8.mp4" type="video/mp4"></video>
+        <div class="vcap" data-i18n="vid5_cap">Aerial · Masterplan Geral</div>
+      </div>
+      <div class="vc">
+        <video autoplay muted loop playsinline><source src="Entrada_do_Shoroom_1.mp4" type="video/mp4"></video>
+        <div class="vcap" data-i18n="vid6_cap">Entrada do Showroom</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRODUTOS -->
+<section id="produtos">
+  <div class="ct">
+    <span class="stag" data-i18n="tag_products">◆ Programa de Produtos</span>
+    <h2 class="st">5 Produtos.<br><em>Um Destino Completo.</em></h2>
+    <p class="sd" data-i18n="products_desc">O portfólio de Cala Imperial combina propriedades residenciais, resort hoteleiro e infraestrutura aeronáutica — permitindo ao investidor capturar retorno em múltiplas frentes simultaneamente.</p>
+    <div class="pg">
+      <div class="pc">
+        <div class="pn">01</div><div class="pi">🏖️</div>
+        <div class="pt" data-i18n="p1_tag">Residencial Premium</div>
+        <div class="pm" data-i18n="p1_name">Lotes Frente-Mar</div>
+        <p class="pd" data-i18n="p1_desc">180 lotes exclusivos de 1.500 a 2.500m² com acesso direto à praia privativa, infraestrutura completa e vistas 180° para o Atlântico.</p>
+        <ul class="psp">
+          <li><span data-i18n="spec_qty">Qtd.</span><span>180</span></li>
+          <li><span data-i18n="spec_area">Área</span><span>1.500–2.500m²</span></li>
+          <li><span data-i18n="spec_price">Preço</span><span>R$ 5.000.000</span></li>
+          <li><span>VGV</span><span>R$ 900M</span></li>
+        </ul>
+      </div>
+      <div class="pc">
+        <div class="pn">02</div><div class="pi">🌴</div>
+        <div class="pt" data-i18n="p2_tag">Residencial Standard</div>
+        <div class="pm" data-i18n="p2_name">Lotes Standard</div>
+        <p class="pd" data-i18n="p2_desc">420 lotes de 1.000 a 1.500m² em condomínio fechado com clube privativo, paisagismo premium e acesso às amenidades do resort.</p>
+        <ul class="psp">
+          <li><span data-i18n="spec_qty">Qtd.</span><span>420</span></li>
+          <li><span data-i18n="spec_area">Área</span><span>1.000–1.500m²</span></li>
+          <li><span data-i18n="spec_price">Preço</span><span>R$ 2.260.000</span></li>
+          <li><span>VGV</span><span>R$ 949M</span></li>
+        </ul>
+      </div>
+      <div class="pc">
+        <div class="pn">03</div><div class="pi">🏡</div>
+        <div class="pt" data-i18n="p3_tag">Chalés Condomínio</div>
+        <div class="pm" data-i18n="p3_name">Vila Imperial</div>
+        <p class="pd" data-i18n="p3_desc">150 chalés de alto padrão com 350m² em condomínio exclusivo, piscina privativa e arquitetura tropical contemporânea.</p>
+        <ul class="psp">
+          <li><span data-i18n="spec_qty">Qtd.</span><span>150</span></li>
+          <li><span data-i18n="spec_area">Área</span><span>350m² cada</span></li>
+          <li><span data-i18n="spec_price">Preço</span><span>R$ 2.500.000</span></li>
+          <li><span>VGV</span><span>R$ 375M</span></li>
+        </ul>
+      </div>
+      <div class="pc">
+        <div class="pn">04</div><div class="pi">🌊</div>
+        <div class="pt" data-i18n="p4_tag">Apartamentos</div>
+        <div class="pm" data-i18n="p4_name">Beira-Mar Residences</div>
+        <p class="pd" data-i18n="p4_desc">100 apartamentos ultra-luxury de 180 a 350m² nos edifícios de primeira linha de praia, com varanda gourmet e vistas panorâmicas.</p>
+        <ul class="psp">
+          <li><span data-i18n="spec_qty">Qtd.</span><span>100</span></li>
+          <li><span data-i18n="spec_area">Área</span><span>180–350m²</span></li>
+          <li><span data-i18n="spec_price">Preço</span><span>R$ 4.500.000</span></li>
+          <li><span>VGV</span><span>R$ 450M</span></li>
+        </ul>
+      </div>
+      <div class="pc">
+        <div class="pn">05</div><div class="pi">✈️</div>
+        <div class="pt" data-i18n="p5_tag">Aeronáutico</div>
+        <div class="pm" data-i18n="p5_name">Hangares FBO</div>
+        <p class="pd" data-i18n="p5_desc">15 hangares executivos privativos de 400 a 1.000m² com acesso direto à pista e serviços FBO completos — propriedade aeronáutica exclusiva.</p>
+        <ul class="psp">
+          <li><span data-i18n="spec_qty">Qtd.</span><span>15</span></li>
+          <li><span data-i18n="spec_area">Área</span><span>400–1.000m²</span></li>
+          <li><span data-i18n="spec_price">Preço</span><span>R$ 15.000.000</span></li>
+          <li><span>VGV</span><span>R$ 225M</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- LOCALIZAÇÃO -->
+<section id="loc">
+  <div class="ct">
+    <span class="stag" data-i18n="tag_loc">◆ Localização</span>
+    <h2 class="st" data-i18n="loc_title">Entre Sauípe<br><em>e Praia do Forte.</em></h2>
+    <p class="sd" data-i18n="loc_desc">Subaúma é o elo virgem entre os dois maiores polos de turismo de luxo do Nordeste — ainda inexplorado, com infraestrutura em expansão e valorização acelerada pelo SETUR-BA.</p>
+    <div class="lg2">
+      <div id="mapa"></div>
+      <div>
+        <div class="li"><div style="font-size:20px;flex-shrink:0">📍</div><div><div class="lit" data-i18n="ll_addr">Endereço</div><div class="liv">Subaúma · Entre Rios · Bahia · Brasil</div></div></div>
+        <div class="li"><div style="font-size:20px;flex-shrink:0">✈️</div><div><div class="lit" data-i18n="ll_ssa">Aeroporto Salvador (SSA)</div><div class="liv">~85km · ~55min de carro · ~15min de helicóptero</div></div></div>
+        <div class="li"><div style="font-size:20px;flex-shrink:0">🏖️</div><div><div class="lit" data-i18n="ll_sauipe">Costa do Sauípe</div><div class="liv">~25km · Polo hoteleiro premium consolidado</div></div></div>
+        <div class="li"><div style="font-size:20px;flex-shrink:0">🌟</div><div><div class="lit" data-i18n="ll_forte">Praia do Forte</div><div class="liv">~45km · Destino ultra-premium de referência nacional</div></div></div>
+        <div class="li"><div style="font-size:20px;flex-shrink:0">🛣️</div><div><div class="lit" data-i18n="ll_access">Acesso</div><div class="liv">BA-099 (Linha Verde) · Acesso asfaltado direto ao terreno</div></div></div>
+        <div class="li" style="border-bottom:none"><div style="font-size:20px;flex-shrink:0">📈</div><div><div class="lit" data-i18n="ll_market">Mercado</div><div class="liv">R$1,2Bi em investimentos turísticos previstos na Linha Verde até 2033 (SETUR-BA)</div></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- INVESTIMENTO -->
+<section id="inv">
+  <div class="ct">
+    <span class="stag" data-i18n="tag_inv">◆ Tese de Investimento</span>
+    <h2 class="st">R$7,5 bilhões de VGV.<br><em>167% de ROI em 8 anos.</em></h2>
+    <p class="sd" data-i18n="inv_desc">Estudo de viabilidade financeira completo — Fevereiro 2026. VGV de R$7,5 bilhões sobre investimento total de R$2,8 bilhões. TIR estimada de 18–22% a.a. com payback entre 6 e 7 anos.</p>
+    <div class="itabs">
+      <div class="itab active" onclick="sTab('g')" data-i18n="tab_g">Visão Geral</div>
+      <div class="itab" onclick="sTab('v')" data-i18n="tab_v">VGV & Receitas</div>
+      <div class="itab" onclick="sTab('c')" data-i18n="tab_c">Custos por Fase</div>
+      <div class="itab" onclick="sTab('s')" data-i18n="tab_s">Cenários</div>
+    </div>
+
+    <!-- GERAL -->
+    <div class="ipanel active" id="tg">
+      <div class="ihl3">
+        <div class="ihl"><span class="ihlv">R$700M</span><span class="ihll">Entrada 25% · Tudo Incluído</span></div>
+        <div class="ihl"><span class="ihlv">R$7,5Bi</span><span class="ihll">VGV Projetado Total</span></div>
+        <div class="ihl"><span class="ihlv">10,7×</span><span class="ihll">Alavancagem VGV / Entrada</span></div>
+      </div>
+      <table><thead><tr><th data-i18n="th_item">Item</th><th data-i18n="th_value">Valor</th><th data-i18n="th_obs">Observação</th></tr></thead><tbody>
+        <tr style="background:rgba(201,168,76,.1)"><td><strong style="color:var(--gold-l)">⬇️ Entrada do Investidor — 25% do Custo Total</strong></td><td style="color:var(--gold-l)"><strong>R$ 700.000.000</strong></td><td style="color:var(--gold-l)"><strong>Inicia imediatamente todo o empreendimento</strong></td></tr>
+        <tr><td style="padding-left:28px">↳ Pagamento ao Terrenista (incluso na entrada)</td><td style="color:var(--gold-l)">R$ 165.000.000</td><td>1.280ha · 5,3km praia · À vista · Abaixo do mercado</td></tr>
+        <tr><td style="padding-left:28px">↳ Projetos, Licenças, EIA/RIMA, ANAC</td><td style="color:var(--gold-l)">R$ 97.000.000</td><td>Caminho crítico: 24–26 meses de aprovações</td></tr>
+        <tr><td style="padding-left:28px">↳ Início Fase 1 · Terraplanagem + Vias + Infra base</td><td style="color:var(--gold-l)">R$ 438.000.000</td><td>Obras iniciais de infraestrutura</td></tr>
+        <tr><td>Saldo 75% · Financiado pelo fluxo de vendas</td><td>R$ 2.100.000.000</td><td>Caixa das Fases 2B e 3 cobre o restante</td></tr>
+        <tr><td>VGV Total (Vendas + Operação 10 anos)</td><td style="color:var(--gold-l)">R$ 7.500.000.000</td><td>Estudo de Viabilidade Fev. 2026</td></tr>
+        <tr class="tr"><td><strong>Resultado Bruto Estimado</strong></td><td><strong>R$ 4.700.000.000</strong></td><td><strong>ROI 167% sobre custo total · 8 anos</strong></td></tr>
+        <tr><td>TIR — Cenário Base</td><td style="color:var(--gold-l)">~20% a.a.</td><td>Prazo 8 anos · Estudo de viabilidade Fev. 2026</td></tr>
+        <tr><td>TIR — Cenário Otimista</td><td style="color:var(--gold-l)">~22% a.a.</td><td>Prazo 6 anos</td></tr>
+        <tr><td>Payback</td><td style="color:var(--gold-l)">6–7 anos</td><td>Fluxo acumulado positivo</td></tr>
+        <tr><td>Custo terreno vs. concorrentes urbanizados</td><td style="color:var(--gold-l)">50–200× mais barato</td><td>R$128.906/ha vs. R$3–6M/ha (Sauípe/Forte)</td></tr>
+        <tr class="tz"><td>Valorização projetada com aprovações</td><td>+250%</td><td>Terra nua → lotes urbanizados aprovados</td></tr>
+      </tbody></table>
+    </div>
+
+    <!-- VGV -->
+    <div class="ipanel" id="tv">
+      <div class="ihl3">
+        <div class="ihl"><span class="ihlv">R$2,9Bi</span><span class="ihll">Vendas Residenciais</span></div>
+        <div class="ihl"><span class="ihlv">R$4,5Bi</span><span class="ihll">Operação Resort (10 anos VPL)</span></div>
+        <div class="ihl"><span class="ihlv">865</span><span class="ihll">Unidades / Lotes</span></div>
+      </div>
+      <table><thead><tr><th>Produto</th><th>Qtd.</th><th>Preço Médio</th><th>VGV</th><th>% VGV Vendas</th></tr></thead><tbody>
+        <tr><td>🏖️ Lotes Premium Frente-Mar</td><td style="color:var(--gold-l)">180</td><td>R$ 5.000.000</td><td style="color:var(--gold-l)">R$ 900.000.000</td><td>31%</td></tr>
+        <tr><td>🌴 Lotes Standard</td><td style="color:var(--gold-l)">420</td><td>R$ 2.260.000</td><td style="color:var(--gold-l)">R$ 949.200.000</td><td>33%</td></tr>
+        <tr><td>🏡 Chalés Vila Imperial</td><td style="color:var(--gold-l)">150</td><td>R$ 2.500.000</td><td style="color:var(--gold-l)">R$ 375.000.000</td><td>13%</td></tr>
+        <tr><td>🌊 Aptos Beira-Mar</td><td style="color:var(--gold-l)">100</td><td>R$ 4.500.000</td><td style="color:var(--gold-l)">R$ 450.000.000</td><td>15.5%</td></tr>
+        <tr><td>✈️ Hangares FBO (venda)</td><td style="color:var(--gold-l)">15</td><td>R$ 15.000.000</td><td style="color:var(--gold-l)">R$ 225.000.000</td><td>7.5%</td></tr>
+        <tr class="tr"><td><strong>SUBTOTAL VENDAS</strong></td><td><strong>865</strong></td><td>—</td><td><strong>R$ 2.899.200.000</strong></td><td><strong>100%</strong></td></tr>
+        <tr><td colspan="3">🏨 Resort & Hotelaria (VPL 10 anos)</td><td style="color:var(--gold-l)">R$ 1.023.750.000</td><td rowspan="5" style="color:var(--gold-l);vertical-align:middle;font-size:15px;font-weight:700">R$ 4,5Bi</td></tr>
+        <tr><td colspan="3">⚓ Marina (vagas + operação)</td><td style="color:var(--gold-l)">R$ 192.000.000</td></tr>
+        <tr><td colspan="3">🍽️ Restaurantes (3)</td><td style="color:var(--gold-l)">R$ 540.000.000</td></tr>
+        <tr><td colspan="3">🏊 Beach Club Premium</td><td style="color:var(--gold-l)">R$ 120.000.000</td></tr>
+        <tr><td colspan="3">🛍️ Shopping Boulevard</td><td style="color:var(--gold-l)">R$ 144.000.000</td></tr>
+        <tr class="tr"><td colspan="3"><strong>VGV TOTAL</strong></td><td><strong>R$ 7.500.000.000</strong></td><td></td></tr>
+      </tbody></table>
+    </div>
+
+    <!-- CUSTOS -->
+    <div class="ipanel" id="tc">
+      <div class="ihl3">
+        <div class="ihl"><span class="ihlv">R$680M</span><span class="ihll">Fase 1 · Infraestrutura</span></div>
+        <div class="ihl"><span class="ihlv">R$480M</span><span class="ihll">Fase 2A · Aeródromo</span></div>
+        <div class="ihl"><span class="ihlv">R$1,82Bi</span><span class="ihll">Fase 2B · Resort & Marina</span></div>
+      </div>
+      <table><thead><tr><th>Fase</th><th>Descrição</th><th>Investimento</th><th>Prazo</th></tr></thead><tbody>
+        <tr><td>Pré-obra</td><td>Licenças, Projetos Executivos, Captação</td><td style="color:var(--gold-l)">R$ 96.800.000</td><td>6–8 meses</td></tr>
+        <tr><td>Fase 1</td><td>Terraplanagem, Vias (45km), Água/Esgoto, Energia, Telecom</td><td style="color:var(--gold-l)">R$ 680.000.000</td><td>18–24 meses</td></tr>
+        <tr><td>Fase 2A</td><td>Pista 1.800m, 15 Hangares, Terminal FBO, Torre de Controle</td><td style="color:var(--gold-l)">R$ 480.000.000</td><td>14–18 meses</td></tr>
+        <tr><td>Fase 2B</td><td>Resort 600 UHs, Marina Circular, Beach Club, Spa, Golf, Shopping</td><td style="color:var(--gold-l)">R$ 1.820.000.000</td><td>24–30 meses</td></tr>
+        <tr><td>Fase 3</td><td>Urbanização Residencial, Chalés, Apartamentos (auto-financiado pelas vendas)</td><td style="color:var(--gold-l)">R$ 1.100.000.000</td><td>36–48 meses</td></tr>
+        <tr><td>Marketing & Vendas</td><td>Campanha, Maquetes, Experience Center, Corretagem</td><td style="color:var(--gold-l)">R$ 220.000.000</td><td>Contínuo</td></tr>
+        <tr class="tr"><td><strong>TOTAL</strong></td><td><strong>Investimento Total do Projeto</strong></td><td><strong>R$ 2.800.000.000</strong></td><td><strong>6–8 anos</strong></td></tr>
+        <tr class="tz"><td colspan="4">* Fase 3 Residencial é amplamente auto-financiada pelo fluxo de vendas das fases anteriores</td></tr>
+      </tbody></table>
+      <div style="margin-top:24px;padding:20px;border:1px solid rgba(201,168,76,.12);background:rgba(201,168,76,.03)">
+        <div style="font-size:9px;letter-spacing:2px;color:var(--gold);text-transform:uppercase;margin-bottom:12px">Caminho Crítico · Licenciamentos</div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px">
+          <div style="font-size:11px;color:var(--tm);padding:10px;border-left:2px solid rgba(201,168,76,.3)">EIA/RIMA<br><span style="color:var(--gold-l)">10–14 meses</span><br><span style="font-size:10px">Item mais crítico</span></div>
+          <div style="font-size:11px;color:var(--tm);padding:10px;border-left:2px solid rgba(201,168,76,.3)">Licenças INEMA<br><span style="color:var(--gold-l)">12–18 meses</span><br><span style="font-size:10px">LP → LI → LO</span></div>
+          <div style="font-size:11px;color:var(--tm);padding:10px;border-left:2px solid rgba(201,168,76,.3)">ANAC Aeródromo<br><span style="color:var(--gold-l)">12–16 meses</span><br><span style="font-size:10px">Certificação RBAC</span></div>
+          <div style="font-size:11px;color:var(--tm);padding:10px;border-left:2px solid rgba(201,168,76,.3)">Aprovação Prefeitura<br><span style="color:var(--gold-l)">8–12 meses</span><br><span style="font-size:10px">Alvará loteamento</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CENÁRIOS -->
+    <div class="ipanel" id="ts">
+      <div class="sc3">
+        <div class="sc" style="border-color:rgba(168,184,200,.3)">
+          <div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--tm);margin-bottom:10px">🔴 Cenário Conservador</div>
+          <span style="font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:300;color:var(--tm);display:block;line-height:1">Vendas lentas</span>
+          <span style="font-family:'Cormorant Garamond',serif;font-size:24px;color:var(--tm)">VGV ~R$5Bi</span>
+          <div style="height:4px;background:rgba(255,255,255,.08);margin:14px 0;border-radius:3px"><div style="height:100%;width:40%;border-radius:3px;background:#6B7B8B"></div></div>
+          <div style="font-size:12px;color:var(--tm)">TIR ~14% a.a. · Prazo 10 anos · ROI ~79%</div>
+        </div>
+        <div class="sc" style="border-color:rgba(201,168,76,.35);background:rgba(201,168,76,.03)">
+          <div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:10px">🟡 Cenário Base</div>
+          <span style="font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:300;color:var(--gold-l);display:block;line-height:1">Velocidade moderada</span>
+          <span style="font-family:'Cormorant Garamond',serif;font-size:24px;color:var(--gold-l)">VGV R$7,5Bi</span>
+          <div style="height:4px;background:rgba(255,255,255,.08);margin:14px 0;border-radius:3px"><div style="height:100%;width:62%;border-radius:3px;background:var(--gold)"></div></div>
+          <div style="font-size:12px;color:var(--tm)">TIR ~20% a.a. · Payback 6–7 anos · ROI 167%</div>
+        </div>
+        <div class="sc" style="border-color:rgba(212,175,55,.45)">
+          <div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#D4AF37;margin-bottom:10px">🟢 Cenário Otimista</div>
+          <span style="font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:300;color:#D4AF37;display:block;line-height:1">Alta demanda</span>
+          <span style="font-family:'Cormorant Garamond',serif;font-size:24px;color:#D4AF37">VGV R$9Bi+</span>
+          <div style="height:4px;background:rgba(255,255,255,.08);margin:14px 0;border-radius:3px"><div style="height:100%;width:78%;border-radius:3px;background:#D4AF37"></div></div>
+          <div style="font-size:12px;color:var(--tm)">TIR ~22% a.a. · Payback 5–6 anos · ROI 220%+</div>
+        </div>
+      </div>
+      <div style="margin-top:32px;background:var(--dark3);padding:28px;border:1px solid rgba(201,168,76,.1)">
+        <div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:14px">Fluxo de Caixa Anual — Cenário Base (8 anos)</div>
+        <div class="cf6">
+          <div class="cf6d"><div style="font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--gold-l)">–R$776M</div><div style="font-size:10px;color:var(--tm);margin-top:5px">Ano 1–2 / Infra</div></div>
+          <div class="cf6d"><div style="font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--gold-l)">–R$480M</div><div style="font-size:10px;color:var(--tm);margin-top:5px">Ano 2–3 / Aeródromo</div></div>
+          <div class="cf6d"><div style="font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--gold-l)">+R$320M</div><div style="font-size:10px;color:var(--tm);margin-top:5px">Ano 3 / Lançamento</div></div>
+          <div class="cf6d"><div style="font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--gold-l)">+R$950M</div><div style="font-size:10px;color:var(--tm);margin-top:5px">Ano 4–5 / Vendas</div></div>
+          <div class="cf6d"><div style="font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--gold-l)">+R$1,8Bi</div><div style="font-size:10px;color:var(--tm);margin-top:5px">Ano 5–6 / Resort</div></div>
+          <div class="cf6d"><div style="font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--gold-l)">+R$2,1Bi</div><div style="font-size:10px;color:var(--tm);margin-top:5px">Ano 6–8 / Full Op</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CRONOGRAMA -->
+<section id="cron">
+  <div class="ct">
+    <span class="stag" data-i18n="tag_cron">◆ Cronograma</span>
+    <h2 class="st">5 Fases em<br><em>6 a 8 Anos.</em></h2>
+    <p class="sd" data-i18n="cron_desc">Desenvolvimento escalonado com marcos físicos e financeiros claros. As fases 2A (Aeródromo) e 2B (Resort) podem ser sobrepostas para otimização do prazo total.</p>
+    <div class="tl">
+      <div class="tli"><div class="tld">0</div><div class="tlc">
+        <div class="tlp">Fase 0 · Em Andamento</div>
+        <h3 class="tlt">Estruturação e Captação</h3>
+        <p class="tldesc">Estudos de viabilidade, masterplan conceitual e executivo, due diligence documental (297ha + 983ha), formatação da SPE, NDA e captação de consórcio de investidores. Projetos e licenças iniciais.</p>
+        <span class="tlv">R$ 96.800.000 · Projetos & Licenças</span>
+      </div></div>
+      <div class="tli"><div class="tld">1</div><div class="tlc">
+        <div class="tlp">Fase 1 · Meses 08–32 · R$680M</div>
+        <h3 class="tlt">Infraestrutura Base</h3>
+        <p class="tldesc">Terraplanagem de 800 hectares. 45 km de vias pavimentadas. Sistema completo de água e esgoto + ETE. Subestação elétrica 138kV + rede. Fibra óptica + 5G. Drenagem, paisagismo base, cercamento perimetral 12km e portaria monumental.</p>
+        <span class="tlv">R$ 680.000.000</span>
+      </div></div>
+      <div class="tli"><div class="tld">2A</div><div class="tlc">
+        <div class="tlp">Fase 2A · Meses 18–36 · R$480M</div>
+        <h3 class="tlt">Aeródromo Executivo</h3>
+        <p class="tldesc">Pista 1.800m × 45m (Cat. 4C) para jatos executivos. Pista de táxi 600m. Pátio de aeronaves 25.000m². 15 hangares executivos 400–1.000m². Terminal FBO 2.500m². Torre de controle. Heliponto Cat. 1. Sistema IFR noturno. Certificação ANAC/RBAC 154.</p>
+        <span class="tlv">R$ 480.000.000</span>
+      </div></div>
+      <div class="tli"><div class="tld">2B</div><div class="tlc">
+        <div class="tlp">Fase 2B · Meses 24–54 · R$1,82Bi</div>
+        <h3 class="tlt">Resort 5★ & Marina Imperial</h3>
+        <p class="tldesc">Hotel principal 600 unidades hoteleiras. Marina circular 200+ vagas para superyachts. Beach Club 5.000m². Spa & Wellness 3.500m². 3 restaurantes (fine dining + casual). Parque aquático 15.000m². Centro de Convenções 4.000m². Golf Course 9 holes. Shopping Boulevard 8.000m² com 40 lojas.</p>
+        <span class="tlv">R$ 1.820.000.000</span>
+      </div></div>
+      <div class="tli"><div class="tld">3</div><div class="tlc">
+        <div class="tlp">Fase 3 · Meses 36–84 · R$1,1Bi</div>
+        <h3 class="tlt">Desenvolvimento Residencial</h3>
+        <p class="tldesc">Urbanização completa das zonas residenciais. Lançamento dos 850 lotes + 150 chalés + 100 apartamentos. Bairro circular com praça central. Clube privativo residencial. Infraestrutura de canal navegável. Segurança 24h. Entrega de escrituras e constituição dos condomínios.</p>
+        <span class="tlv">R$ 1.100.000.000</span>
+      </div></div>
+    </div>
+  </div>
+</section>
+
+<!-- SPE -->
+<section id="spe">
+  <div class="ct">
+    <span class="stag" data-i18n="tag_spe">◆ Estrutura de Entrada & SPE</span>
+    <h2 class="st">25% do Custo Total.<br><em>R$700M · Tudo Incluído.</em></h2>
+    <p class="sd" data-i18n="spe_desc">Para iniciar o empreendimento, o investidor aporta <strong style="color:var(--gold-l)">25% do custo total de R$2,8 bilhões = R$700 milhões</strong>. Este valor cobre integralmente o pagamento do terrenista (R$165M à vista), as licenças, os projetos executivos e o início da Fase 1 de infraestrutura. O saldo restante de 75% é financiado pelo fluxo de vendas das fases subsequentes.</p>
+
+    <!-- DESTAQUE ENTRADA -->
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:2px;background:rgba(201,168,76,.15);margin:48px 0 52px">
+      <div style="background:rgba(201,168,76,.12);border:1px solid rgba(201,168,76,.35);padding:38px 32px;text-align:center;position:relative">
+        <div style="position:absolute;top:0;left:0;right:0;height:3px;background:var(--gold)"></div>
+        <div style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:14px" data-i18n="entry_tag2">◆ Entrada 25% · Para Iniciar</div>
+        <div style="font-family:'Cormorant Garamond',serif;font-size:52px;font-weight:300;color:var(--gold-l);line-height:1">R$700M</div>
+        <div style="font-size:11px;color:var(--tm);margin-top:12px;line-height:1.7" data-i18n="entry_desc2">25% do custo total de R$2,8Bi<br>Inicia imediatamente todo o empreendimento<br>Inclui pagamento do terrenista</div>
+        <div style="margin-top:16px;background:var(--gold);color:var(--dark);padding:8px 16px;font-size:9px;letter-spacing:2px;text-transform:uppercase;font-weight:700;display:inline-block" data-i18n="entry_cta_badge">Aporte de Entrada</div>
+      </div>
+      <div style="background:rgba(201,168,76,.06);border:1px solid rgba(201,168,76,.2);padding:38px 32px;text-align:center">
+        <div style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:14px" data-i18n="entry_tag1">◆ Terrenista · Incluso na Entrada</div>
+        <div style="font-family:'Cormorant Garamond',serif;font-size:52px;font-weight:300;color:var(--gold-l);line-height:1">R$165M</div>
+        <div style="font-size:11px;color:var(--tm);margin-top:12px;line-height:1.7" data-i18n="entry_desc1">1.280ha · 5,3km de praia virgem<br>Pagamento à vista · Abaixo do mercado<br>Terrenista não participa da incorporação<br><em style="color:var(--gold)">Coberto pelos R$700M de entrada</em></div>
+      </div>
+      <div style="background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);padding:38px 32px;text-align:center">
+        <div style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:14px" data-i18n="entry_tag3">◆ Saldo 75%</div>
+        <div style="font-family:'Cormorant Garamond',serif;font-size:52px;font-weight:300;color:var(--tl);line-height:1">R$2,1Bi</div>
+        <div style="font-size:11px;color:var(--tm);margin-top:12px;line-height:1.7" data-i18n="entry_desc3">75% restantes do investimento total<br>Financiado pelo fluxo de vendas<br>das fases 2B e 3 do empreendimento</div>
+      </div>
+    </div>
+
+    <!-- BOX EXPLICATIVO -->
+    <div style="background:rgba(201,168,76,.04);border:1px solid rgba(201,168,76,.15);padding:36px;margin-bottom:52px">
+      <div style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:20px">◆ Como Funciona o Modelo de Entrada</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:28px">
+        <div>
+          <p style="font-size:13px;line-height:1.85;color:var(--tm)" data-i18n="entry_how1">O investidor aporta <strong style="color:var(--gold-l)">25% do custo total do empreendimento (R$700M)</strong> para iniciar a incorporação. Esse valor cobre o pagamento integral ao terrenista (<strong style="color:var(--tl)">R$165M à vista</strong>) para liberar os 1.280 hectares, mais as licenças ambientais, projetos executivos e o início da Fase 1 de infraestrutura.</p>
+          <p style="font-size:13px;line-height:1.85;color:var(--tm);margin-top:14px" data-i18n="entry_how2">O <strong style="color:var(--gold-l)">saldo de 75% (R$2,1Bi)</strong> é financiado pelo próprio fluxo de caixa do projeto — as vendas das Fases 2B e 3 cobrem a continuidade das obras sem necessidade de novo aporte do investidor. Uma estrutura de alavancagem excepcional: R$700M de entrada para um VGV de R$7,5 bilhões.</p>
+        </div>
+        <div>
+          <div style="padding:20px;border-left:3px solid var(--gold)">
+            <p style="font-size:12px;line-height:1.9;color:var(--tm)" data-i18n="entry_flow">
+              <strong style="color:var(--gold-l);font-size:13px">Destino dos R$700M de entrada:</strong><br><br>
+              ✅ <strong style="color:var(--tl)">R$165M</strong> → Pagamento à vista ao terrenista · saída completa<br><br>
+              ✅ <strong style="color:var(--tl)">~R$97M</strong> → Projetos, licenças, EIA/RIMA, ANAC, Prefeitura<br><br>
+              ✅ <strong style="color:var(--tl)">~R$438M</strong> → Início da Fase 1 (terraplanagem, vias, infra base)<br><br>
+              📊 <strong style="color:var(--gold-l)">R$2,1Bi restantes</strong> → financiados pelas vendas das fases seguintes
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ESTRUTURA SOCIETÁRIA -->
+    <div class="speg">
+      <div class="spec" style="background:rgba(201,168,76,.04);border:1px solid rgba(201,168,76,.12)">
+        <div class="spet">Investidor · Capital</div>
+        <div class="spen">Fundo / Family Office</div>
+        <ul class="spel">
+          <li>Aporte de entrada <strong style="color:var(--gold-l)">R$700M</strong> (25% do custo total)</li>
+          <li>Cobre o terrenista R$165M + infraestrutura inicial</li>
+          <li>Saldo 75% financiado pelo fluxo de vendas</li>
+          <li>TIR estimada <strong style="color:var(--gold-l)">18–22% a.a.</strong> · ROI <strong style="color:var(--gold-l)">167% em 8 anos</strong></li>
+          <li>Preferred return + waterfall pré-definido em contrato</li>
+          <li>Alienação fiduciária do terreno em favor do investidor</li>
+        </ul>
+      </div>
+      <div class="spec" style="background:rgba(201,168,76,.04);border:1px solid rgba(201,168,76,.12)">
+        <div class="spet">Incorporadora · Desenvolvimento</div>
+        <div class="spen">Yorim Grupo</div>
+        <ul class="spel">
+          <li>Gestão integral do empreendimento e da SPE</li>
+          <li>Coordenação dos licenciamentos (INEMA, ANAC, Prefeitura)</li>
+          <li>Relacionamento com operadoras hoteleiras 5★ internacionais</li>
+          <li>Consórcio de construtoras e fornecedores especializados</li>
+          <li>Representante no Conselho de Administração da SPE</li>
+          <li>Reporting mensal e governança transparente</li>
+        </ul>
+      </div>
+      <div class="spec">
+        <div class="spet">Projetos · Consultoria Técnica</div>
+        <div class="spen">Studio 3droom</div>
+        <ul class="spel">
+          <li>Masterplan conceitual e executivo</li>
+          <li>Projetos arquitetônicos e urbanísticos</li>
+          <li>Coordenação de projetos de engenharia</li>
+          <li>Gestão dos estudos ambientais (EIA/RIMA)</li>
+          <li>Projetos aeroportuários (pista, hangares, FBO)</li>
+          <li>Acompanhamento técnico de obras · 8 anos</li>
+        </ul>
+      </div>
+    </div>
+    <div class="spep">
+      <div class="spepp">◆ Proteções Contratuais ao Investidor</div>
+      <div class="spepg">
+        <div class="spepi">Alienação fiduciária registrada sobre a totalidade do terreno (1.280ha) em favor do investidor desde o sinal</div>
+        <div class="spepi">Conta escrow bancária dedicada — movimentação requer dupla assinatura investidor + incorporadora</div>
+        <div class="spepi">Due diligence jurídica, ambiental e topográfica completa antes de qualquer aporte</div>
+        <div class="spepi">Relatório de progresso mensal com documentação fotográfica, planilhas e marcos do cronograma</div>
+        <div class="spepi">Conselho de Administração da SPE com assento e direito de veto do investidor em decisões estratégicas</div>
+        <div class="spepi">Cláusula de preferred return com waterfall pré-definido e irrevogável no contrato social da SPE</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PASSOS -->
+<section id="passos">
+  <div class="ct">
+    <span class="stag" data-i18n="tag_steps">◆ Como Investir</span>
+    <h2 class="st">8 Próximos Passos<br><em>para Ingressar.</em></h2>
+    <p class="sd" data-i18n="steps_desc">Um processo estruturado e transparente — do primeiro contato até o início das obras. Toda a documentação disponível sob NDA para investidores qualificados.</p>
+    <div class="pasg">
+      <div class="pasc"><div class="pasn">01</div><div class="pasi">🤝</div>
+        <div class="past" data-i18n="step1_t">Assinatura de NDA</div>
+        <p class="pasd" data-i18n="step1_d">Acordo de confidencialidade recíproco para acesso ao pacote completo: masterplan, modelo financeiro detalhado, estudos ambientais e documentação jurídica dos dois imóveis (297ha + 983ha).</p>
+        <div class="pastime">⏱ Semana 1</div>
+      </div>
+      <div class="pasc"><div class="pasn">02</div><div class="pasi">🔍</div>
+        <div class="past" data-i18n="step2_t">Due Diligence</div>
+        <p class="pasd" data-i18n="step2_d">Due diligence técnica, jurídica, ambiental e financeira. Visita ao terreno, análise de matrículas, certidões, estudos topográficos e avaliação de potencial de desenvolvimento.</p>
+        <div class="pastime">⏱ 15–30 dias</div>
+      </div>
+      <div class="pasc"><div class="pasn">03</div><div class="pasi">📋</div>
+        <div class="past" data-i18n="step3_t">LOI + Term Sheet</div>
+        <p class="pasd" data-i18n="step3_d">Carta de intenções e term sheet definindo aporte, participação societária, estrutura de preferred return, waterfall, cronograma de desembolsos e condições de saída.</p>
+        <div class="pastime">⏱ 30 dias</div>
+      </div>
+      <div class="pasc"><div class="pasn">04</div><div class="pasi">🏛️</div>
+        <div class="past" data-i18n="step4_t">Constituição da SPE</div>
+        <p class="pasd" data-i18n="step4_d">Formação da Sociedade de Propósito Específico, registro em cartório, abertura de conta escrow e constituição do Conselho de Administração com representante do investidor.</p>
+        <div class="pastime">⏱ 45 dias</div>
+      </div>
+      <div class="pasc"><div class="pasn">05</div><div class="pasi">🏦</div>
+        <div class="past" data-i18n="step5_t">Aporte de Entrada · 25%</div>
+        <p class="pasd" data-i18n="step5_d">O investidor aporta <strong style="color:var(--gold-l)">R$700M (25% do custo total de R$2,8Bi)</strong>. Este valor cobre integralmente o pagamento ao terrenista (R$165M à vista), os projetos e licenças (~R$97M) e o início da Fase 1 de infraestrutura (~R$438M). O terreno é garantido com alienação fiduciária em nome do investidor.</p>
+        <div class="pastime">⏱ Aporte Inicial · Mês 1–2</div>
+      </div>
+      <div class="pasc"><div class="pasn">06</div><div class="pasi">🚀</div>
+        <div class="past" data-i18n="step6_t">Início das Obras</div>
+        <p class="pasd" data-i18n="step6_d">Com o terreno adquirido e os projetos em andamento, inicia-se a Fase 1 de infraestrutura. O saldo de 75% (R$2,1Bi) é financiado pelo fluxo de caixa das vendas das fases seguintes — sem necessidade de novo aporte do investidor.</p>
+        <div class="pastime">⏱ Meses 8–32</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- GALERIA -->
+<section id="galeria">
+  <div class="ct">
+    <span class="stag" data-i18n="tag_gallery">◆ Galeria</span>
+    <h2 class="st">Cala Imperial<br><em>em todos os ângulos.</em></h2>
+  </div>
+  <div class="ct" style="padding-top:0">
+    <div class="gg" style="margin-top:48px">
+      <div class="gi" onclick="openLb('94.png')"><img src="94.png" alt=""><div class="gcap">Lobby Resort · Beira-Mar</div></div>
+      <div class="gi" onclick="openLb('95.png')"><img src="95.png" alt=""><div class="gcap">Marina Imperial · Sunrise</div></div>
+      <div class="gi" onclick="openLb('96.png')"><img src="96.png" alt=""><div class="gcap">Vista Aérea · Aeródromo</div></div>
+      <div class="gi" onclick="openLb('97.png')"><img src="97.png" alt=""><div class="gcap">Vista Aérea · 1.280ha</div></div>
+      <div class="gi" onclick="openLb('98.png')"><img src="98.png" alt=""><div class="gcap">Marina · Promenade · Pôr do Sol</div></div>
+      <div class="gi" onclick="openLb('99.png')"><img src="99.png" alt=""><div class="gcap">Marina Central · Clube Náutico</div></div>
+      <div class="gi" onclick="openLb('100.png')"><img src="100.png" alt=""><div class="gcap">Resort Beira-Mar · Praia Privativa</div></div>
+      <div class="gi" onclick="openLb('101.png')"><img src="101.png" alt=""><div class="gcap">Bairro Circular · Solar · Aeródromo</div></div>
+      <div class="gi" onclick="openLb('102.png')"><img src="102.png" alt=""><div class="gcap">Beachfront Towers · Piscinas</div></div>
+      <div class="gi" onclick="openLb('103.png')"><img src="103.png" alt=""><div class="gcap">Vista Aérea · Detalhes</div></div>
+      <div class="gi" onclick="openLb('masterplan_6.png')"><img src="masterplan_6.png" alt=""><div class="gcap">Plano Diretor · Fase 1</div></div>
+      <div class="gi" onclick="openLb('75.png')"><img src="75.png" alt=""><div class="gcap">Lounge Beachfront · Sunset</div></div>
+      <div class="gi" onclick="openLb('76.png')"><img src="76.png" alt=""><div class="gcap">Pool Bar · Vista Oceano</div></div>
+      <div class="gi" onclick="openLb('77.png')"><img src="77.png" alt=""><div class="gcap">Vista Aérea · Neblina Matinal</div></div>
+      <div class="gi" onclick="openLb('78.png')"><img src="78.png" alt=""><div class="gcap">Dock Restaurant · Night</div></div>
+      <div class="gi" onclick="openLb('92.png')"><img src="92.png" alt=""><div class="gcap">Infinity Pool · Vista Marina</div></div>
+      <div class="gi" onclick="openLb('93.png')"><img src="93.png" alt=""><div class="gcap">Penthouse · Terraço · Oceano</div></div>
+      <div class="gi" onclick="openLb('81.png')"><img src="81.png" alt=""><div class="gcap">Vista Aérea Sunset · Marina</div></div>
+      <div class="gi" onclick="openLb('82.png')"><img src="82.png" alt=""><div class="gcap">Terminal FBO · Aviação</div></div>
+      <div class="gi" onclick="openLb('86.png')"><img src="86.png" alt=""><div class="gcap">Mobilidade Elétrica</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTATO -->
+<section id="contato">
+  <div class="ct">
+    <span class="stag" data-i18n="tag_contact">◆ Contato</span>
+    <h2 class="st">Inicie a<br><em>Conversa.</em></h2>
+    <div class="cog">
+      <div>
+        <p class="sd" style="margin-bottom:36px" data-i18n="contact_desc">Disponibilizamos o investor pack completo — estudo de viabilidade financeira (Fev. 2026), análise de concorrência, custos detalhados de projetos e aprovações, masterplan e documentação do terreno — mediante NDA.</p>
+        <div class="cii"><div style="font-size:20px;flex-shrink:0">📧</div><div><div class="cil">E-mail</div><div class="civ">renanrass.contato@gmail.com</div></div></div>
+        <div class="cii"><div style="font-size:20px;flex-shrink:0">📱</div><div><div class="cil">WhatsApp</div><div class="civ">+55 (62) 99641-1604</div></div></div>
+        <div class="cii" style="border-bottom:none"><div style="font-size:20px;flex-shrink:0">📍</div><div><div class="cil" data-i18n="ci_loc">Terreno</div><div class="civ">Subaúma · Entre Rios · Linha Verde · Bahia</div></div></div>
+        <div style="margin-top:28px;padding:22px;border:1px solid rgba(201,168,76,.15);background:rgba(201,168,76,.03)">
+          <p style="font-size:11px;letter-spacing:1px;color:var(--gold);text-transform:uppercase;margin-bottom:8px">◆ Investor Pack · Disponível sob NDA</p>
+          <p style="font-size:12px;color:var(--tm);line-height:1.75" data-i18n="inv_pack">Estudo de Viabilidade Financeira (Fev. 2026) · Análise de Concorrência · Plano Diretor com Zoneamento · Custos Detalhados de Projetos e Aprovações · Documentação jurídica dos imóveis · Arquivo KML do terreno (1.280ha)</p>
+          <div style="margin-top:16px;display:grid;grid-template-columns:1fr 1fr;gap:10px">
+            <div style="padding:12px;background:rgba(201,168,76,.08);border-left:2px solid var(--gold)">
+              <div style="font-size:9px;letter-spacing:2px;color:var(--gold);text-transform:uppercase;margin-bottom:4px">Terreno</div>
+              <div style="font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--gold-l)">R$165M à vista</div>
+              <div style="font-size:11px;color:var(--tm)">1.280ha · Terrenista sai</div>
+            </div>
+            <div style="padding:12px;background:rgba(201,168,76,.12);border-left:2px solid var(--gold)">
+              <div style="font-size:9px;letter-spacing:2px;color:var(--gold);text-transform:uppercase;margin-bottom:4px">Entrada (25%)</div>
+              <div style="font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--gold-l)">R$700M</div>
+              <div style="font-size:11px;color:var(--tm)">Inicia a incorporação</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div id="formWrapper">
+          <div class="cof" id="contactForm">
+            <div class="cfr">
+              <div class="cfg"><label data-i18n="lbl_name">Nome</label><input type="text" id="cName" placeholder="Seu nome completo"></div>
+              <div class="cfg"><label data-i18n="lbl_company">Empresa / Fundo</label><input type="text" id="cCompany" placeholder="Nome da empresa"></div>
+            </div>
+            <div class="cfg"><label>E-mail</label><input type="email" id="cEmail" placeholder="email@empresa.com"></div>
+            <div class="cfg"><label>WhatsApp / Phone</label><input type="tel" id="cPhone" placeholder="+55 (xx) 99999-9999"></div>
+            <div class="cfg">
+              <label data-i18n="lbl_profile">Perfil</label>
+              <select id="cProfile">
+                <option value="" data-i18n="opt_sel">Selecione...</option>
+                <option>Fundo de Investimento / Family Office</option>
+                <option>Private Equity / Asset Manager</option>
+                <option>Incorporadora / Developer</option>
+                <option>Fundo Soberano / Institucional</option>
+                <option>HNWI / UHNWI</option>
+                <option>Outro</option>
+              </select>
+            </div>
+            <div class="cfg">
+              <label data-i18n="lbl_ticket">Ticket Pretendido</label>
+              <select id="cTicket">
+                <option value="">Selecione...</option>
+                <option>R$50M – R$160M (Terreno)</option>
+                <option>R$160M – R$500M</option>
+                <option>R$500M – R$1Bi</option>
+                <option>R$1Bi+ (Full Development)</option>
+              </select>
+            </div>
+            <div class="cfg"><label data-i18n="lbl_msg">Mensagem</label><textarea id="cMsg" placeholder="Interesse, perguntas, cronograma de análise..."></textarea></div>
+            <button class="cfsub" onclick="submitForm()" data-i18n="btn_sub">Solicitar NDA + Investor Pack</button>
+          </div>
+          <div class="fsuc" id="formSuccess">
+            <h3 data-i18n="suc_title">Mensagem Recebida.</h3>
+            <p style="font-size:13px;color:var(--tm)" data-i18n="suc_desc">Retornaremos em até 24h com o NDA e o investor pack completo de Cala Imperial · Subaúma.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="ct">
+    <div class="fg">
+      <div>
+        <a href="#" class="logo" style="margin-bottom:0">
+          <svg viewBox="0 0 46 46" fill="none" style="width:36px;height:36px">
+            <polygon points="23,3 43,23 23,43 3,23" stroke="#C9A84C" stroke-width="1.2" fill="none"/>
+            <polygon points="23,8 38,23 23,38 8,23" stroke="#C9A84C" stroke-width="0.5" fill="none" opacity="0.4"/>
+            <text x="23" y="27.5" text-anchor="middle" font-family="serif" font-size="9" fill="#C9A84C" font-style="italic">CI</text>
+          </svg>
+          <div class="logo-text"><span>Cala Imperial</span><span>Subaúma · Linha Verde · Bahia</span></div>
+        </a>
+        <p class="fbd" data-i18n="foot_desc">Cala Imperial — o maior mega-resort integrado do Nordeste. 1.280 hectares · 5,3km de praia · Aeródromo Executivo · Marina 200+ · Resort 5★ · VGV R$7,5Bi · ROI 167% em 8 anos.</p>
+      </div>
+      <div>
+        <p class="fct" data-i18n="ft_nav">Navegação</p>
+        <ul class="fcl">
+          <li><a href="#conceito" data-i18n="nav_project">O Projeto</a></li>
+          <li><a href="#zonas" data-i18n="nav_zones">Plano Diretor</a></li>
+          <li><a href="#produtos" data-i18n="nav_products">Produtos</a></li>
+          <li><a href="#masterplan" data-i18n="nav_masterplan">Masterplan</a></li>
+          <li><a href="#inv" data-i18n="nav_invest">Investimento</a></li>
+          <li><a href="#cron">Cronograma</a></li>
+          <li><a href="#galeria" data-i18n="nav_gallery">Galeria</a></li>
+        </ul>
+      </div>
+      <div>
+        <p class="fct" data-i18n="ft_contact">Contato</p>
+        <ul class="fcl">
+          <li><a href="mailto:renanrass.contato@gmail.com">renanrass.contato@gmail.com</a></li>
+          <li><a href="https://wa.me/5562996411604">WhatsApp +55 62 99641-1604</a></li>
+          <li style="margin-top:20px"><a href="#contato" class="ncta" style="font-size:9px">Solicitar NDA</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="fb">
+      <p class="fc" data-i18n="foot_copy">© 2026 Cala Imperial · Studio 3droom · Todos os direitos reservados</p>
+      <p class="fl" data-i18n="foot_disc">Documento confidencial de apresentação a investidores. Projeções financeiras são estimativas baseadas em estudo de viabilidade (Fev. 2026) e não constituem garantia de rentabilidade. Sujeito a aprovações regulatórias, licenças ambientais e aeronáuticas vigentes.</p>
+    </div>
+  </div>
+</footer>
+
+<!-- LIGHTBOX -->
+<div class="lb" id="lb" onclick="closeLb()">
+  <button class="lbc" onclick="closeLb()">✕</button>
+  <img src="" id="lbImg" alt="">
+</div>
+
+<script>
+// NAV
+window.addEventListener('scroll',function(){document.getElementById('nav').classList.toggle('sc',window.scrollY>60)});
+
+// VIDEO fallback
+(function(){
+  var v=document.getElementById('heroVid');
+  v.addEventListener('error',function(){v.style.display='none';document.getElementById('hfb').style.display='block'});
+  v.load();
+})();
+
+// TABS
+function sTab(id){
+  document.querySelectorAll('.ipanel').forEach(function(p){p.classList.remove('active')});
+  document.querySelectorAll('.itab').forEach(function(t){t.classList.remove('active')});
+  document.getElementById('t'+id).classList.add('active');
+  event.target.classList.add('active');
+}
+
+// LIGHTBOX
+function openLb(src){document.getElementById('lbImg').src=src;document.getElementById('lb').classList.add('active');document.body.style.overflow='hidden'}
+function closeLb(){document.getElementById('lb').classList.remove('active');document.body.style.overflow=''}
+document.addEventListener('keydown',function(e){if(e.key==='Escape')closeLb()});
+
+// MASTERPLAN
+var mpIndex=0;
+var mpItems=[
+  {img:'masterplan_6.png',label:'Plano Diretor Fase 1 · Mapa de Densidade Urbana'},
+  {img:'102.png',label:'Resort Beira-Mar · Beachfront Towers · Piscinas'},
+  {img:'99.png',label:'Marina Central · Clube Náutico · Píeres'},
+  {img:'100.png',label:'Resort Beira-Mar · Tiki Bar · Praia Privativa'},
+  {img:'101.png',label:'Bairro Circular · Solar · Aeródromo Executivo'},
+  {img:'96.png',label:'Vista Aérea · Marina + Aeródromo + Residências'},
+  {img:'97.png',label:'Vista Aérea Geral · 1.280ha · Canal Navegável'}
+];
+function mpNav(d){
+  mpIndex=(mpIndex+d+mpItems.length)%mpItems.length;
+  document.getElementById('mpTrack').style.transform='translateX(-'+mpIndex+'00%)';
+  document.getElementById('mpLabel').textContent=mpItems[mpIndex].label;
+  updateDots();
+}
+function updateDots(){document.querySelectorAll('.mpd').forEach(function(d,i){d.style.background=i===mpIndex?'var(--gold)':'rgba(255,255,255,.2)'})}
+(function(){
+  var c=document.getElementById('mpDots');
+  mpItems.forEach(function(_,i){var d=document.createElement('button');d.className='mpd';d.onclick=function(){mpIndex=i-1;mpNav(1)};c.appendChild(d)});
+  updateDots();
+})();
+
+// MAP — Subaúma, Entre Rios, Bahia
+document.addEventListener('DOMContentLoaded',function(){
+  try{
+    var map=L.map('mapa',{scrollWheelZoom:false}).setView([-12.178,-37.958],12);
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{attribution:'&copy; OpenStreetMap &copy; CARTO',maxZoom:19}).addTo(map);
+    var icon=L.divIcon({html:'<div style="background:var(--gold);width:14px;height:14px;border-radius:50%;border:3px solid rgba(201,168,76,.4);box-shadow:0 0 14px rgba(201,168,76,.6)"></div>',iconSize:[14,14],iconAnchor:[7,7]});
+    L.marker([-12.178,-37.958],{icon:icon}).addTo(map).bindPopup('<strong style="font-family:serif;color:#C9A84C;font-size:14px">Cala Imperial · Subaúma</strong><br><span style="font-size:11px;color:#888">1.280ha · 5,3km praia · Linha Verde · BA</span>');
+    L.circle([-12.178,-37.958],{color:'rgba(201,168,76,0.15)',fillColor:'rgba(201,168,76,0.05)',fillOpacity:1,radius:6400}).addTo(map);
+  }catch(e){}
+});
+
+// FORM
+function submitForm(){
+  var n=document.getElementById('cName').value,e=document.getElementById('cEmail').value;
+  if(!n||!e){alert('Por favor preencha nome e e-mail.');return}
+  document.getElementById('contactForm').style.display='none';
+  document.getElementById('formSuccess').style.display='block';
+}
+
+// LANGUAGE
+var L18N={
+  pt:{
+    nav_project:'O Projeto',nav_zones:'Plano Diretor',nav_products:'Produtos',nav_masterplan:'Masterplan',
+    nav_invest:'Investimento',nav_gallery:'Galeria',nav_cta:'Solicitar NDA',
+    hero_badge:'Subaúma · Entre Rios · Linha Verde · Bahia · Brasil',
+    hero_pre:'Aeródromo Executivo · Marina · Resort 5★ · Residências Ultra-Luxury',
+    hero_sub:'O Maior Mega-Resort Integrado do Nordeste Brasileiro · 1.280 Hectares · 5,3km de Praia',
+    hero_btn1:'Explorar o Projeto',hero_btn2:'Solicitar NDA',
+    hs_area:'Área Total',hs_beach:'Frente de Praia',hs_vgv:'VGV Projetado',hs_roi:'ROI em 8 anos',
+    nb_entry:'Entrada 25% · Inicia o Empreendimento',nb_land:'Terrenista · Incluso na Entrada',nb_vgv:'VGV Projetado',nb_roi:'ROI em 8 Anos',nb_tir:'TIR a.a.',
+    tag_concept:'◆ O Conceito',
+    concept_desc1:'Cala Imperial é o primeiro mega-resort integrado do Nordeste brasileiro — e o maior da América Latina. Em 1.280 hectares com 5,3 quilômetros de praia virgem na Linha Verde de Bahia, nasce um ecossistema completo de ultra-luxury: aeródromo executivo com pista de 1.800m, marina circular para 200+ superyachts, resort de 600 unidades hoteleiras, 850 lotes e residências e 360 hectares de Reserva Natural de Mata Atlântica.',
+    concept_desc2:'Localizado entre Costa do Sauípe e Praia do Forte — as regiões mais valorizadas do Nordeste — o projeto oferece ao investidor a oportunidade de criar um destino global de luxo em terra ainda virgem, com custo de aquisição 50 a 200 vezes mais competitivo que os concorrentes.',
+    kl_area:'Área Total',kl_beach:'Praia Virgem',kl_salvador:'De Salvador',kl_land:'Valor Terreno',
+    tag_zones:'◆ Plano Diretor · Fase 1',
+    zones_desc:'O Mapa de Densidade Urbana define 6 zonas distintas que compõem o ecossistema integrado de Cala Imperial — combinando turismo de ultra-luxury, residências de alto padrão, aviação executiva e preservação ambiental.',
+    z1_ha:'120 hectares',z1_title:'Aeroporto Executivo',z1_desc:'Aeródromo privativo com pista 1.800m × 45m (Cat. 4C), capacidade para jatos executivos de grande porte, operação IFR noturna.',
+    z1_l1:'Pista 1.800m × 45m · Cat. 4C',z1_l2:'15 Hangares Executivos (400–1.000m²)',z1_l3:'Terminal FBO · 2.500m² · VIP Lounge',z1_l4:'Torre de Controle + Heliponto Cat. 1',z1_l5:'Operação IFR noturna · Jet fuel',
+    z2_ha:'Marina + Resort · 350ha',z2_title:'Zona Hoteleira',z2_desc:'Resort 5★ de 600 unidades hoteleiras com marina circular para 200+ superyachts, beach club, spa, golf e shopping boulevard.',
+    z2_l1:'Resort 5★ · 600 Unidades Hoteleiras',z2_l2:'Marina Circular · 200+ vagas superyachts',z2_l3:'Beach Club Premium · Infinity Pools',z2_l4:'Spa & Wellness · Golf 9 holes',z2_l5:'Shopping Boulevard · 8.000m² · 40 lojas',
+    z3_ha:'450 hectares',z3_title:'Zona Residencial',z3_desc:'850 lotes e residências divididos em alta, média e baixa densidade, com clube privativo, canal navegável e segurança 24h.',
+    z3_l1:'180 Lotes Premium Frente-Mar (1.500–2.500m²)',z3_l2:'420 Lotes Standard (1.000–1.500m²)',z3_l3:'150 Chalés Condomínio · 350m² cada',z3_l4:'100 Aptos Beira-Mar · 180–350m²',z3_l5:'Bairro Circular com praça central',
+    z4_ha:'360 hectares preservados',z4_title:'RPPN Mata Atlântica',z4_desc:'Reserva Natural Particular do Patrimônio Natural — 360 hectares de Mata Atlântica preservada, gerando créditos de carbono e certificação LEED Platinum.',
+    z4_l1:'360ha Reserva Natural (RPPN)',z4_l2:'Certificação LEED Platinum',z4_l3:'Créditos de Carbono · Eco-turismo',z4_l4:'Trilhas · Centro de Visitação',
+    z5_ha:'Canal Navegável',z5_title:'Canal Imperial',z5_desc:'Canal navegável que integra a marina à zona residencial e às áreas de lazer — um percurso aquático privativo único no Brasil.',
+    z5_l1:'Canal navegável interligando zonas',z5_l2:'Cais privativos residenciais',z5_l3:'Passeios de barco internos',z5_l4:'Esportes náuticos exclusivos',
+    z6_ha:'Zona Turística',z6_title:'Resort Beira-Mar',z6_desc:'Zona Turística de Alta Intensidade com resort beira-mar, piscinas, tiki bar e 5,3km de praia privativa.',
+    z6_l1:'5,3km de Praia Privativa',z6_l2:'Piscinas Resort · Tiki Bar',z6_l3:'Beach Club 5.000m²',z6_l4:'Deck madeira nobre · Cabanas VIP',
+    tag_mp:'◆ Masterplan',mp_desc:'1.280 hectares com zoneamento detalhado — Aeroporto Executivo, Marina Central, Resort Beira-Mar, Zona Residencial, Canal Navegável e 360ha de Reserva Natural de Mata Atlântica.',
+    mp_caption:'Clique para ampliar · Mapa de Densidade Urbana · Plano Diretor Fase 1',
+    tag_videos:'◆ Vídeos do Empreendimento',
+    vid1_cap:'Vista Aérea · Empreendimento',vid2_cap:'Marina Imperial · Aerial',vid3_cap:'Marina Central · Superyachts',vid4_cap:'Resort Beira-Mar · Praia',vid5_cap:'Aerial · Masterplan Geral',vid6_cap:'Entrada do Showroom',
+    tag_products:'◆ Programa de Produtos',products_desc:'O portfólio de Cala Imperial combina propriedades residenciais, resort hoteleiro e infraestrutura aeronáutica — permitindo ao investidor capturar retorno em múltiplas frentes simultaneamente.',
+    p1_tag:'Residencial Premium',p1_name:'Lotes Frente-Mar',p1_desc:'180 lotes exclusivos de 1.500 a 2.500m² com acesso direto à praia privativa, infraestrutura completa e vistas 180° para o Atlântico.',
+    p2_tag:'Residencial Standard',p2_name:'Lotes Standard',p2_desc:'420 lotes de 1.000 a 1.500m² em condomínio fechado com clube privativo, paisagismo premium e acesso às amenidades do resort.',
+    p3_tag:'Chalés Condomínio',p3_name:'Vila Imperial',p3_desc:'150 chalés de alto padrão com 350m² em condomínio exclusivo, piscina privativa e arquitetura tropical contemporânea.',
+    p4_tag:'Apartamentos',p4_name:'Beira-Mar Residences',p4_desc:'100 apartamentos ultra-luxury de 180 a 350m² nos edifícios de primeira linha de praia, com varanda gourmet e vistas panorâmicas.',
+    p5_tag:'Aeronáutico',p5_name:'Hangares FBO',p5_desc:'15 hangares executivos privativos de 400 a 1.000m² com acesso direto à pista e serviços FBO completos.',
+    spec_qty:'Qtd.',spec_area:'Área',spec_price:'Preço Médio',
+    tag_loc:'◆ Localização',loc_title:'Entre Sauípe<br><em>e Praia do Forte.</em>',
+    loc_desc:'Subaúma é o elo virgem entre os dois maiores polos de turismo de luxo do Nordeste — ainda inexplorado, com infraestrutura em expansão e valorização acelerada.',
+    ll_addr:'Endereço',ll_ssa:'Aeroporto Salvador (SSA)',ll_sauipe:'Costa do Sauípe',ll_forte:'Praia do Forte',ll_access:'Acesso',ll_market:'Mercado',
+    tag_inv:'◆ Tese de Investimento',tab_g:'Visão Geral',tab_v:'VGV & Receitas',tab_c:'Custos por Fase',tab_s:'Cenários',
+    th_item:'Item',th_value:'Valor',th_obs:'Observação',
+    tag_cron:'◆ Cronograma',cron_desc:'Desenvolvimento escalonado com marcos físicos e financeiros claros. As fases 2A (Aeródromo) e 2B (Resort) podem ser sobrepostas para otimização do prazo total.',
+    tag_spe:'◆ Estrutura de Entrada & SPE',spe_desc:'Para iniciar o empreendimento, o investidor aporta 25% do custo total de R$2,8Bi = R$700M. Este valor cobre integralmente o terrenista (R$165M à vista), licenças e o início das obras. O saldo 75% é financiado pelo fluxo de vendas.',
+    entry_tag1:'◆ Valor do Terreno',entry_desc1:'1.280 hectares · 5,3km de praia\nVenda à vista · Abaixo do valor de mercado\nTerrenista não participa da incorporação',
+    entry_tag2:'◆ Entrada Para Iniciar',entry_desc2:'25% do valor do terreno\nInicia imediatamente a incorporação\nProtocolos + SPE + Licenças',entry_cta_badge:'Menor Ticket de Entrada',
+    entry_tag3:'◆ Saldo Restante',entry_desc3:'75% restantes do terreno\nPago conforme cronograma de captação\nou em parcelas acordadas na SPE',
+    entry_how1:'O proprietário do terreno (terrenista) possui 1.280 hectares com 5,3km de praia em Subaúma e optou por não participar da incorporação. Ele deseja receber R$165 milhões à vista para liberar o ativo — valor abaixo do preço de mercado para uma área desta extensão e localização.',
+    entry_how2:'Esta condição cria uma janela de oportunidade única: o investidor adquire um dos maiores e mais estratégicos terrenos do litoral brasileiro a R$128.906/ha — enquanto lotes já urbanizados na região custam R$3 a R$6 milhões por hectare.',
+    entry_flow:'Destino dos R$700M de entrada:\n\n✅ R$165M → Pagamento ao terrenista (à vista · sai do projeto)\n\n✅ R$97M → Projetos, licenças, EIA/RIMA, ANAC, Prefeitura\n\n✅ R$438M → Início da Fase 1 (terraplanagem, vias, infra)\n\n📊 R$2,1Bi restantes → financiados pelas vendas das fases seguintes',
+    step5_t:'Aporte de Entrada · 25% = R$700M',step5_d:'O investidor aporta R$700M (25% do custo total de R$2,8Bi). Cobre o terrenista (R$165M à vista), licenças (~R$97M) e início da Fase 1 (~R$438M). Terreno garantido com alienação fiduciária.',
+    step6_t:'Início das Obras',step6_d:'Com o terreno adquirido e licenças em andamento, inicia-se a Fase 1. O saldo 75% (R$2,1Bi) é financiado pelo fluxo de caixa das vendas — sem novo aporte do investidor.',
+    tag_gallery:'◆ Galeria',tag_contact:'◆ Contato',
+    contact_desc:'Disponibilizamos o investor pack completo — estudo de viabilidade, análise de concorrência, custos e documentação — mediante NDA.',
+    ci_loc:'Terreno',inv_pack:'Estudo de Viabilidade Financeira · Análise de Concorrência · Plano Diretor · Custos de Projetos e Aprovações · Documentação jurídica · Arquivo KML (1.280ha)',
+    lbl_name:'Nome',lbl_company:'Empresa / Fundo',lbl_profile:'Perfil',lbl_ticket:'Ticket Pretendido',lbl_msg:'Mensagem',opt_sel:'Selecione...',
+    btn_sub:'Solicitar NDA + Investor Pack',suc_title:'Mensagem Recebida.',suc_desc:'Retornaremos em até 24h com o NDA e o investor pack completo de Cala Imperial · Subaúma.',
+    ft_nav:'Navegação',ft_contact:'Contato',
+    foot_desc:'Cala Imperial — o maior mega-resort integrado do Nordeste. 1.280 hectares · 5,3km de praia · Aeródromo Executivo · Marina 200+ · Resort 5★ · VGV R$7,5Bi · ROI 167%.',
+    foot_copy:'© 2026 Cala Imperial · Studio 3droom · Todos os direitos reservados',
+    foot_disc:'Documento confidencial de apresentação a investidores. Projeções financeiras são estimativas baseadas em estudo de viabilidade (Fev. 2026) e não constituem garantia de rentabilidade.'
+  },
+  en:{
+    nav_project:'The Project',nav_zones:'Master Plan',nav_products:'Products',nav_masterplan:'Masterplan',
+    nav_invest:'Investment',nav_gallery:'Gallery',nav_cta:'Request NDA',
+    hero_badge:'Subaúma · Entre Rios · Linha Verde · Bahia · Brazil',
+    hero_pre:'Executive Airport · Marina · 5★ Resort · Ultra-Luxury Residences',
+    hero_sub:"Brazil's Largest Integrated Mega-Resort · 1,280 Hectares · 5.3km of Pristine Beach",
+    hero_btn1:'Explore the Project',hero_btn2:'Request NDA',
+    hs_area:'Total Area',hs_beach:'Beach Frontage',hs_vgv:'Projected GDV',hs_roi:'ROI over 8 years',
+    nb_entry:'25% Entry · Starts the Project',nb_land:'Landowner · Included in Entry',nb_vgv:'Projected GDV',nb_roi:'ROI over 8 Years',nb_tir:'IRR p.a.',
+    tag_concept:'◆ The Concept',
+    concept_desc1:"Cala Imperial is the first integrated mega-resort in Northeast Brazil — and the largest in Latin America. On 1,280 hectares with 5.3 kilometers of virgin beach on Bahia's Linha Verde, a complete ultra-luxury ecosystem is born: executive airport with 1,800m runway, circular marina for 200+ superyachts, a 600-key resort, 850 lots and residences, and 360 hectares of Atlantic Forest Nature Reserve.",
+    concept_desc2:'Located between Costa do Sauípe and Praia do Forte — the most valued tourist regions of Northeast Brazil — the project offers investors the opportunity to create a global luxury destination on still-virgin land, at an acquisition cost 50 to 200 times more competitive than competitors.',
+    kl_area:'Total Area',kl_beach:'Virgin Beach',kl_salvador:'From Salvador',kl_land:'Land Value',
+    tag_zones:'◆ Master Plan · Phase 1',
+    zones_desc:"The Urban Density Map defines 6 distinct zones forming Cala Imperial's integrated ecosystem — combining ultra-luxury tourism, premium residences, executive aviation, and environmental preservation.",
+    z1_ha:'120 hectares',z1_title:'Executive Airport',z1_desc:'Private airfield with 1,800m × 45m runway (Cat. 4C), capacity for large executive jets, IFR night operations.',
+    z1_l1:'1,800m × 45m Runway · Cat. 4C',z1_l2:'15 Executive Hangars (400–1,000m²)',z1_l3:'FBO Terminal · 2,500m² · VIP Lounge',z1_l4:'Control Tower + Cat. 1 Helipad',z1_l5:'IFR night operations · Jet fuel',
+    z2_ha:'Marina + Resort · 350ha',z2_title:'Hotel Zone',z2_desc:'600-key 5★ resort with circular marina for 200+ superyachts, beach club, spa, golf, and shopping boulevard.',
+    z2_l1:'5★ Resort · 600 Hotel Units',z2_l2:'Circular Marina · 200+ superyacht berths',z2_l3:'Premium Beach Club · Infinity Pools',z2_l4:'Spa & Wellness · 9-hole Golf Course',z2_l5:'Shopping Boulevard · 8,000m² · 40 stores',
+    z3_ha:'450 hectares',z3_title:'Residential Zone',z3_desc:'850 lots and residences divided into high, medium and low density, with private club, navigable canal and 24h security.',
+    z3_l1:'180 Premium Beachfront Lots (1,500–2,500m²)',z3_l2:'420 Standard Lots (1,000–1,500m²)',z3_l3:'150 Villa Condominiums · 350m² each',z3_l4:'100 Beachfront Apartments · 180–350m²',z3_l5:'Circular neighbourhood with central plaza',
+    z4_ha:'360 hectares preserved',z4_title:'Atlantic Forest Reserve',z4_desc:'Private Natural Heritage Reserve — 360 hectares of preserved Atlantic Forest, generating carbon credits and LEED Platinum certification.',
+    z4_l1:'360ha Nature Reserve (RPPN)',z4_l2:'LEED Platinum Certification',z4_l3:'Carbon Credits · Eco-tourism',z4_l4:'Hiking trails · Visitor Centre',
+    z5_ha:'Navigable Canal',z5_title:'Imperial Canal',z5_desc:'Navigable canal connecting the marina to the residential zone and leisure areas — a unique private waterway in Brazil.',
+    z5_l1:'Navigable canal connecting all zones',z5_l2:'Private residential docks',z5_l3:'Internal boat tours',z5_l4:'Exclusive water sports',
+    z6_ha:'Tourism Zone',z6_title:'Beachfront Resort',z6_desc:'High-intensity Tourism Zone with beachfront resort, pools, tiki bar and 5.3km of private beach — the largest private beachfront in Northeast Brazil.',
+    z6_l1:'5.3km Private Beach',z6_l2:'Resort Pools · Tiki Bar',z6_l3:'Beach Club 5,000m²',z6_l4:'Noble wood deck · VIP Cabanas',
+    tag_mp:'◆ Masterplan',mp_desc:'1,280 integrated hectares — Executive Airport, Central Marina, Beachfront Resort, Residential Zone, Navigable Canal and 360ha Atlantic Forest Nature Reserve.',
+    mp_caption:'Click to enlarge · Urban Density Map · Master Plan Phase 1',
+    tag_videos:'◆ Project Videos',
+    vid1_cap:'Aerial View · Development',vid2_cap:'Imperial Marina · Aerial',vid3_cap:'Central Marina · Superyachts',vid4_cap:'Beachfront Resort · Beach',vid5_cap:'Aerial · General Masterplan',vid6_cap:'Showroom Entrance',
+    tag_products:'◆ Product Programme',products_desc:"Cala Imperial's portfolio combines residential properties, hotel resort and aeronautical infrastructure — allowing the investor to capture return from multiple fronts simultaneously.",
+    p1_tag:'Premium Residential',p1_name:'Beachfront Lots',p1_desc:'180 exclusive lots of 1,500 to 2,500m² with direct access to the private beach, full infrastructure and 180° Atlantic Ocean views.',
+    p2_tag:'Standard Residential',p2_name:'Standard Lots',p2_desc:'420 lots of 1,000 to 1,500m² in gated condominium with private club, premium landscaping and access to resort amenities.',
+    p3_tag:'Villa Condominium',p3_name:'Imperial Villas',p3_desc:'150 premium villas of 350m² in exclusive condominium, private pool and contemporary tropical architecture.',
+    p4_tag:'Apartments',p4_name:'Beachfront Residences',p4_desc:'100 ultra-luxury apartments of 180 to 350m² in first beachline buildings, with gourmet balcony and panoramic views.',
+    p5_tag:'Aeronautical',p5_name:'FBO Hangars',p5_desc:'15 private executive hangars of 400 to 1,000m² with direct runway access and full FBO services.',
+    spec_qty:'Units',spec_area:'Area',spec_price:'Avg. Price',
+    tag_loc:'◆ Location',loc_title:'Between Sauípe<br><em>and Praia do Forte.</em>',
+    loc_desc:'Subaúma is the virgin link between the two largest luxury tourism hubs in Northeast Brazil — still unexplored, with expanding infrastructure and accelerating appreciation.',
+    ll_addr:'Address',ll_ssa:'Salvador Airport (SSA)',ll_sauipe:'Costa do Sauípe',ll_forte:'Praia do Forte',ll_access:'Road Access',ll_market:'Market',
+    tag_inv:'◆ Investment Thesis',tab_g:'Overview',tab_v:'GDV & Revenue',tab_c:'Costs by Phase',tab_s:'Scenarios',
+    th_item:'Item',th_value:'Value',th_obs:'Note',
+    tag_cron:'◆ Timeline',cron_desc:'Phased development with clear physical and financial milestones. Phases 2A (Airport) and 2B (Resort) may overlap to optimize total timeline.',
+    tag_spe:'◆ Entry Structure & SPE',spe_desc:"To start the development, the investor contributes 25% of the total cost of R$2.8Bn = R$700M. This covers the landowner in full (R$165M cash), licences and Phase 1 start. The remaining 75% is funded by sales cashflow.",
+    entry_tag1:'◆ Land Value',entry_desc1:'1,280 hectares · 5.3km of beach\nCash sale · Below market value\nLandowner exits the incorporation',
+    entry_tag2:'◆ Down Payment to Start',entry_desc2:'25% of land value\nImmediately starts incorporation\nProtocols + SPE + Licences',entry_cta_badge:'Lowest Entry Ticket',
+    entry_tag3:'◆ Remaining Balance',entry_desc3:'75% remaining\nPaid according to fundraising schedule\nor additional investment round',
+    entry_how1:"The landowner holds 1,280 hectares with 5.3km of beach at Subaúma and has chosen not to participate in the development. They require R$165 million cash to release the asset — below market value for a property of this size and location.",
+    entry_how2:'This creates a unique window of opportunity: the investor acquires one of the most strategic land assets on the Brazilian coast at R$128,906/ha — while urbanised lots in the region trade at R$3 to R$6 million per hectare.',
+    entry_flow:'How the R$700M entry is deployed:\n\n✅ R$165M → Landowner payment (cash · exits project)\n\n✅ R$97M → Projects, licences, EIA/RIMA, ANAC, City Hall\n\n✅ R$438M → Phase 1 start (earthworks, roads, infrastructure)\n\n📊 R$2.1Bn remaining → funded by sales cashflow',
+    step5_t:'Entry Investment · 25% = R$700M',step5_d:'The investor contributes R$700M (25% of total cost of R$2.8Bn). This covers the landowner (R$165M cash), licences (~R$97M) and Phase 1 start (~R$438M). Land secured by mortgage in investor\'s name.',
+    step6_t:'Construction Start',step6_d:'With land acquired and licences underway, Phase 1 infrastructure begins. The remaining 75% (R$2.1Bn) is funded by sales cashflow — no further investor capital contribution required.',
+    tag_gallery:'◆ Gallery',tag_contact:'◆ Contact',
+    contact_desc:'We provide the complete investor pack — feasibility study, competition analysis, costs and documentation — upon NDA signature.',
+    ci_loc:'Land',inv_pack:'Financial Feasibility Study · Competition Analysis · Master Plan · Project & Approval Costs · Legal Documentation · KML File (1,280ha)',
+    lbl_name:'Name',lbl_company:'Company / Fund',lbl_profile:'Profile',lbl_ticket:'Investment Ticket',lbl_msg:'Message',opt_sel:'Select...',
+    btn_sub:'Request NDA + Investor Pack',suc_title:'Message Received.',suc_desc:'We will contact you within 24h with the NDA and complete investor pack for Cala Imperial · Subaúma.',
+    ft_nav:'Navigation',ft_contact:'Contact',
+    foot_desc:"Cala Imperial — Brazil's largest integrated mega-resort. 1,280 hectares · 5.3km of beach · Executive Airport · 200+ Marina · 5★ Resort · GDV R$7.5Bn · ROI 167%.",
+    foot_copy:'© 2026 Cala Imperial · Studio 3droom · All rights reserved',
+    foot_disc:'Confidential investor presentation document. Financial projections are estimates based on a feasibility study (Feb. 2026) and do not constitute a guarantee of returns. Subject to regulatory approvals, environmental and aeronautical licenses.'
+  }
+};
+
+function setLang(lang){
+  document.documentElement.lang=lang==='pt'?'pt-BR':'en';
+  ['pt','en'].forEach(function(l){document.getElementById('btn-'+l).classList.toggle('active',l===lang)});
+  var d=L18N[lang];
+  document.querySelectorAll('[data-i18n]').forEach(function(el){
+    var k=el.getAttribute('data-i18n');
+    if(d[k]!==undefined){
+      if(k.includes('_title')||k==='loc_title'){el.innerHTML=d[k]}
+      else{el.textContent=d[k]}
+    }
+  });
+  try{localStorage.setItem('ci_lang',lang)}catch(e){}
+}
+
+document.addEventListener('DOMContentLoaded',function(){
+  try{var s=localStorage.getItem('ci_lang')||'pt';if(s!=='pt')setLang(s)}catch(e){}
+});
+</script>
+</body>
+</html>
